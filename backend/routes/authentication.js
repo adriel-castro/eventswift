@@ -15,9 +15,12 @@ router.post(
     )
       .matches(/^[a-zA-Z0-9!@#$%^&*()_+{}\[\]:;<>,.?~\/\\-]*$/, "i")
       .isLength(8),
+    check("studentID", "Student ID is required").notEmpty(),
     check("firstName", "Firstname is required").notEmpty(),
     check("lastName", "Lastname is required").notEmpty(),
-    check("birthDate", "BirthDate is required").notEmpty(),
+    check("department", "Department is required").notEmpty(),
+    check("year", "Year level is required").notEmpty(),
+    // check("birthDate", "BirthDate is required").notEmpty(),
   ],
   signup
 );

@@ -2,6 +2,8 @@ const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/Users");
+const Department = require("../models/Departments");
+const Role = require("../models/Roles");
 
 const signup = async (req, res) => {
   try {
@@ -21,15 +23,49 @@ const signup = async (req, res) => {
       return res.status(400).json({ status: false, data: [], errors: errors });
     }
 
-    const { email, firstName, lastName, password, address, birthDate } =
-      req.body;
+    const {
+      email,
+      studentID,
+      firstName,
+      lastName,
+      password,
+      address,
+      birthDate,
+      department,
+      year,
+      role,
+    } = req.body;
 
     let user = await User.findOne({ email: email.toLowerCase() });
     if (user) {
       return res.status(400).json({
         status: false,
         data: [],
-        errors: { message: "User already exists" },
+        errors: { message: "User already exists!" },
+      });
+    }
+
+    let findDepartment = await Department.findOne({
+      name: department.toUpperCase(),
+    });
+
+    if (!findDepartment) {
+      return res.status(400).json({
+        status: false,
+        data: [],
+        errors: { message: "Department does not exists!" },
+      });
+    }
+
+    let findRole = await Role.findOne({
+      name: role.toLowerCase(),
+    });
+
+    if (!findRole) {
+      return res.status(400).json({
+        status: false,
+        data: [],
+        errors: { message: "Role does not exists!" },
       });
     }
 
@@ -39,11 +75,15 @@ const signup = async (req, res) => {
 
     user = new User();
     user.email = email.toLowerCase();
+    user.studentID = studentID;
+    user.password = hashedPassword;
     user.firstName = firstName;
     user.lastName = lastName;
-    user.password = hashedPassword;
     user.address = address;
     user.birthDate = birthDate;
+    user.department = department;
+    user.year = year;
+    user.role = role;
     await user.save();
 
     const accessToken = generateToken(user._id, password);
@@ -53,10 +93,13 @@ const signup = async (req, res) => {
     const newUser = {
       _id: user._id,
       email: user.email,
+      studentID: user.studentID,
       firstName: user.firstName,
       lastName: user.lastName,
       address: user.address,
       birthDate: user.birthDate,
+      department: user.department,
+      year: user.year,
       role: user.role,
       isActive: user.isActive,
       accessToken,
