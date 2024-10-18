@@ -57,16 +57,18 @@ const signup = async (req, res) => {
       });
     }
 
-    let findRole = await Role.findOne({
-      name: role.toLowerCase(),
-    });
-
-    if (!findRole) {
-      return res.status(400).json({
-        status: false,
-        data: [],
-        errors: { message: "Role does not exists!" },
+    if (role) {
+      let findRole = await Role.findOne({
+        name: role.toLowerCase(),
       });
+
+      if (!findRole) {
+        return res.status(400).json({
+          status: false,
+          data: [],
+          errors: { message: "Role does not exists!" },
+        });
+      }
     }
 
     // hash password
@@ -83,7 +85,7 @@ const signup = async (req, res) => {
     user.birthDate = birthDate;
     user.department = department;
     user.year = year;
-    user.role = role;
+    user.role = role ?? "user";
     await user.save();
 
     const accessToken = generateToken(user._id, password);
