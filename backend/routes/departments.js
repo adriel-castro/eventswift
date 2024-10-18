@@ -9,7 +9,7 @@ const {
 } = require("../controllers/departmentController");
 const { auth } = require("../middlewares/auth.middleware");
 
-router.get("/", [auth], getAllDepartments);
+router.get("/", getAllDepartments);
 
 router.post(
   "/add",
