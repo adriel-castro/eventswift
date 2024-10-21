@@ -45,6 +45,16 @@ const signup = async (req, res) => {
       });
     }
 
+    // Check if studentID already exists
+    let findStudentID = await User.findOne({ studentID });
+    if (findStudentID) {
+      return res.status(400).json({
+        status: false,
+        data: [],
+        errors: { message: "User already exists with this Student ID!" },
+      });
+    }
+
     let findDepartment = await Department.findOne({
       name: department.toUpperCase(),
     });
@@ -131,8 +141,13 @@ const login = async (req, res) => {
     }
     const { username, password } = req.body;
 
+    // let findUser = await User.findOne({
+    //   email: username.toLowerCase(),
+    // });
+
+    // Check if the username is an email or studentID
     let findUser = await User.findOne({
-      email: username.toLowerCase(),
+      $or: [{ email: username.toLowerCase() }, { studentID: username }],
     });
 
     const isValid =
@@ -191,7 +206,7 @@ const getMe = async (req, res) => {
         email: request.email,
         isActive: true,
       })
-        .select("-createdAt")
+        .select("-createdAt -password")
         .lean();
 
       res.status(200).json({ status: true, data: user, error: [] });

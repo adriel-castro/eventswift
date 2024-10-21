@@ -22,7 +22,7 @@ const UserSchema = new Schema({
     unique: true,
     validate: emailValidator,
   },
-  studentID: { type: String, required: true },
+  studentID: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -32,6 +32,7 @@ const UserSchema = new Schema({
   address: { type: String },
   department: { type: String, ref: "departments" },
   year: { type: String },
+  avatar: { type: String, dafault: "" },
   // accessToken: { type: String, required: true },
   isActive: {
     type: Boolean,
