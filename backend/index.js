@@ -9,6 +9,7 @@ const usersRoute = require("./routes/users");
 const authRoute = require("./routes/authentication");
 const departmentsRoute = require("./routes/departments");
 const rolesRoute = require("./routes/roles");
+const eventsRoute = require("./routes/events");
 
 const db = process.env.MONGO_URI;
 console.log(db);
@@ -31,6 +32,7 @@ app.use("/api/users", usersRoute);
 app.use("/api/departments", departmentsRoute);
 app.use("/api/roles", rolesRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/events", eventsRoute);
 
 app.use(errorHandler);
 

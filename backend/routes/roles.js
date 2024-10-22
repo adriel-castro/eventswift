@@ -14,14 +14,13 @@ router.get("/", [auth], getAllRoles);
 
 router.post(
   "/add",
-  [check("name", "Role is required").notEmpty()],
-  [auth],
+  [check("name", "Role is required").notEmpty(), auth],
   createRole
 );
 
 router.put(
   "/:id",
-  [[check("name", "Role is required").notEmpty()], auth],
+  [check("name", "Role is required").notEmpty(), auth],
   updateRole
 );
 

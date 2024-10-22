@@ -13,14 +13,13 @@ router.get("/", getAllDepartments);
 
 router.post(
   "/add",
-  [check("name", "Department is required").notEmpty()],
-  [auth],
+  [check("name", "Department is required").notEmpty(), auth],
   addDepartment
 );
 
 router.put(
   "/:id",
-  [[check("name", "Department is required").notEmpty()], auth],
+  [check("name", "Department is required").notEmpty(), auth],
   updateDepartment
 );
 
