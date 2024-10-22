@@ -49,7 +49,7 @@ const createRole = async (req, res) => {
     role.description = description;
     await role.save();
 
-    return res.json({ status: true, data: role, errors: [] });
+    return res.status(200).json({ status: true, data: role, errors: [] });
   } catch (err) {
     return res
       .status(500)
@@ -106,11 +106,9 @@ const deleteRole = async (req, res) => {
         .json({ status: false, data: [], error: "Role not found." });
     }
 
-    return res.json({
-      status: true,
-      data: "Role deleted successfully!",
-      error: [],
-    });
+    return res
+      .status(200)
+      .json({ status: true, data: "Role deleted successfully!", error: [] });
   } catch (err) {
     return res
       .status(500)

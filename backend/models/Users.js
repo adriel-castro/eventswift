@@ -42,10 +42,10 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
-  },
+  // createdBy: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "user",
+  // },
   updatedAt: {
     type: Date,
   },
