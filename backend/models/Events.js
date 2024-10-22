@@ -17,6 +17,7 @@ const EventSchema = mongoose.Schema({
     },
     contact: { type: String },
   },
+  isMandatory: { type: Boolean, default: false },
   status: {
     type: String,
     default: "Not Started",

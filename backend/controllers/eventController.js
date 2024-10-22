@@ -4,17 +4,6 @@ const User = require("../models/Users");
 
 const getAllEvents = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password").lean();
-
-    if (user.role !== "admin") {
-      return res.status(404).json({
-        status: false,
-        data: [],
-        error:
-          "User role is not allowed to manage event. Please contact admin.",
-      });
-    }
-
     let event = await Event.find();
 
     return res.status(200).json({ status: true, data: event, errors: [] });
@@ -66,6 +55,7 @@ const addEvent = async (req, res) => {
       description,
       organizer,
       contact,
+      isMandatory,
       // status,
     } = req.body;
 
@@ -94,6 +84,7 @@ const addEvent = async (req, res) => {
     event.description = description;
     event.organizer.name = organizer;
     event.organizer.contact = contact;
+    event.isMandatory = isMandatory ?? false;
     event.status = "Not Started";
     event.createdBy = req.user._id;
     await event.save();
@@ -152,6 +143,7 @@ const updateEvent = async (req, res) => {
       description,
       organizer,
       contact,
+      isMandatory,
       status,
     } = req.body;
 
@@ -164,6 +156,7 @@ const updateEvent = async (req, res) => {
     findEvent.description = description;
     findEvent.organizer.name = organizer;
     findEvent.organizer.contact = contact;
+    findEvent.isMandatory = isMandatory ?? false;
     findEvent.status = status ?? "Not Started";
     findEvent.updatedAt = Date.now();
     findEvent.updatedBy = req.user._id;

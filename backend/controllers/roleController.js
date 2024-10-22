@@ -49,7 +49,7 @@ const createRole = async (req, res) => {
     role.description = description;
     await role.save();
 
-    return res.json({ status: true, data: role, errors: [] });
+    return res.status(200).json({ status: true, data: role, errors: [] });
   } catch (err) {
     return res
       .status(500)
