@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as api from "../api";
+import { errorHelper } from "../helpers/error.helper";
 
 export const loginUser = async (username, password) => {
   try {
@@ -72,9 +73,48 @@ export const getDepartments = async () => {
   }
 };
 
-export const getEvents = async () => {
+export const getEvents = async (token) => {
   try {
-    const event = await api.getAllEvents();
+    const event = await api.getAllEvents(token);
+    return event.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const createEvent = async (data, token) => {
+  try {
+    const event = await api.addEvent(data, token);
+    return event.data;
+  } catch (error) {
+    errorHelper(error);
+    // if (error.response && error.response.data && error.response.data.errors) {
+    //   const errorMessage = error.response.data.errors[0].message;
+    //   throw new Error(errorMessage);
+    // } else {
+    //   throw new Error(error.message);
+    // }
+  }
+};
+
+export const updateEvent = async (id, data, token) => {
+  try {
+    const event = await api.editEvent(id, data, token);
+    return event.data;
+  } catch (error) {
+    errorHelper(error);
+    // if (error.response && error.response.data && error.response.data.errors) {
+    //   const errorMessage = error.response.data.errors[0].message;
+    //   throw new Error(errorMessage);
+    // } else {
+    //   throw new Error(error.message);
+    // }
+  }
+};
+
+export const deleteEvent = async (id, token) => {
+  try {
+    const event = await api.removeEvent(id, token);
     return event.data;
   } catch (error) {
     if (error.response && error.response.data && error.response.data.errors) {
@@ -86,44 +126,11 @@ export const getEvents = async () => {
   }
 };
 
-export const createEvent = async () => {
+export const createQRCode = async (id, token) => {
   try {
-    const event = await api.addEvent();
-    return event.data;
+    const qr = await api.generateQRCode(id, token);
+    return qr.data;
   } catch (error) {
-    if (error.response && error.response.data && error.response.data.errors) {
-      const errorMessage = error.response.data.errors[0].message;
-      throw new Error(errorMessage);
-    } else {
-      throw new Error(error.message);
-    }
-  }
-};
-
-export const updateEvent = async () => {
-  try {
-    const event = await api.editEvent();
-    return event.data;
-  } catch (error) {
-    if (error.response && error.response.data && error.response.data.errors) {
-      const errorMessage = error.response.data.errors[0].message;
-      throw new Error(errorMessage);
-    } else {
-      throw new Error(error.message);
-    }
-  }
-};
-
-export const deleteEvent = async () => {
-  try {
-    const event = await api.removeEvent();
-    return event.data;
-  } catch (error) {
-    if (error.response && error.response.data && error.response.data.errors) {
-      const errorMessage = error.response.data.errors[0].message;
-      throw new Error(errorMessage);
-    } else {
-      throw new Error(error.message);
-    }
+    errorHelper(error);
   }
 };

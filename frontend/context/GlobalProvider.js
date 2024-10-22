@@ -57,6 +57,7 @@ const GlobalProvider = ({ children }) => {
         user,
         setUser,
         isLoading,
+        accessToken,
       }}
     >
       {children}

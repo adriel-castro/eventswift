@@ -54,3 +54,11 @@ export const removeEvent = (eventId, accessToken) => {
     },
   });
 };
+
+export const generateQRCode = (eventId, accessToken) => {
+  return axios.get(`${url}/qrcode/generate/${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};

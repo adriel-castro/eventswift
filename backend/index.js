@@ -10,6 +10,7 @@ const authRoute = require("./routes/authentication");
 const departmentsRoute = require("./routes/departments");
 const rolesRoute = require("./routes/roles");
 const eventsRoute = require("./routes/events");
+const qrCodeRoute = require("./routes/qrcode.routes");
 
 const db = process.env.MONGO_URI;
 console.log(db);
@@ -33,6 +34,7 @@ app.use("/api/departments", departmentsRoute);
 app.use("/api/roles", rolesRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/events", eventsRoute);
+app.use("/api/qrcode", qrCodeRoute);
 
 app.use(errorHandler);
 
