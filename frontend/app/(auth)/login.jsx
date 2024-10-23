@@ -15,6 +15,7 @@ import CustomButton from "../../components/CustomButton";
 import { Link, router } from "expo-router";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { loginUser, getCurrentUser } from "../../lib/db";
+import Loader from "../../components/reusables/Loader";
 
 const LogIn = () => {
   const [form, setForm] = useState({
@@ -22,7 +23,7 @@ const LogIn = () => {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setUser, setIsLoggedIn } = useGlobalContext();
+  const { setUser, setIsLoggedIn, networkStatus } = useGlobalContext();
 
   const storeData = async (key, value) => {
     try {
@@ -62,51 +63,65 @@ const LogIn = () => {
 
   return (
     <SafeAreaView className="bg-primary h-full">
-      <ScrollView>
-        <View className="w-full min-h-[85vh] justify-center px-4 my-6">
-          <Image
-            source={images.logo}
-            resizeMode="contain"
-            className="w-[80px] h-[80px]"
-          />
-          <Text className="text-2xl text-secondary text-semibold mt-5 font-psemibold">
-            Log in to Eventswift
-          </Text>
+      {isSubmitting ? (
+        <Loader />
+      ) : (
+        <ScrollView>
+          <View className="w-full min-h-[85vh] justify-center px-4 my-6">
+            <Image
+              source={images.logo}
+              resizeMode="contain"
+              className="w-[80px] h-[80px]"
+            />
 
-          <FormField
-            title="Email or Student ID"
-            value={form.username}
-            handleChangeText={(e) => setForm({ ...form, username: e })}
-            otherStyles="mt-7"
-            keyboardType="email-address"
-          />
-          <FormField
-            title="Password"
-            value={form.password}
-            handleChangeText={(e) => setForm({ ...form, password: e })}
-            otherStyles="mt-7"
-          />
+            {networkStatus === null ? (
+              <Text className="mt-5 text-xl text-red-500 text-semibold font-psemibold">
+                You can't Login, please connect to the University WiFi.
+              </Text>
+            ) : (
+              <Text className="text-2xl text-secondary text-semibold mt-5 font-psemibold">
+                Log in to Eventswift
+              </Text>
+            )}
 
-          <CustomButton
-            title="Log in"
-            handlePress={submit}
-            containerStyles="mt-7"
-            isLoading={isSubmitting}
-          />
+            <FormField
+              title="Email or Student ID"
+              value={form.username}
+              handleChangeText={(e) => setForm({ ...form, username: e })}
+              otherStyles="mt-7"
+              keyboardType="email-address"
+            />
+            <FormField
+              title="Password"
+              value={form.password}
+              handleChangeText={(e) => setForm({ ...form, password: e })}
+              otherStyles="mt-7"
+            />
 
-          <View className="justify-center pt-5 flex-row gap-2">
-            <Text className="text-lg text-gray-100 font-pregular">
-              Don't have account?
-            </Text>
-            <Link
-              href="/signup"
-              className="text-lg font-psemibold text-secondary"
-            >
-              Sign Up
-            </Link>
+            <CustomButton
+              title="Log in"
+              handlePress={submit}
+              containerStyles="mt-7"
+              // isLoading={isSubmitting}
+              isLoading={networkStatus === null ? true : isSubmitting}
+            />
+
+            {networkStatus !== null ? (
+            <View className="justify-center pt-5 flex-row gap-2">
+              <Text className="text-lg text-gray-100 font-pregular">
+                Don't have account?
+              </Text>
+              <Link
+                href="/signup"
+                className="text-lg font-psemibold text-secondary"
+              >
+                Sign Up
+              </Link>
+            </View>
+            ) : null}
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

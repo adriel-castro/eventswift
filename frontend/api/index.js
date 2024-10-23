@@ -62,3 +62,35 @@ export const generateQRCode = (eventId, accessToken) => {
     },
   });
 };
+
+export const getUserEventLogs = (eventId, accessToken) => {
+  return axios.get(`${url}/attendance/${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const checkInToEvent = (eventId, accessToken) => {
+  return axios.post(
+    `${url}/attendance/checkin/${eventId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+};
+
+export const updateEventTimeStamps = (eventId, accessToken) => {
+  return axios.put(`${url}/attendance/timestamp-logs/${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const wifiConnectionStatus = () => {
+  return axios.get(`${url}/wifi/check`);
+};

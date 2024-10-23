@@ -88,12 +88,6 @@ export const createEvent = async (data, token) => {
     return event.data;
   } catch (error) {
     errorHelper(error);
-    // if (error.response && error.response.data && error.response.data.errors) {
-    //   const errorMessage = error.response.data.errors[0].message;
-    //   throw new Error(errorMessage);
-    // } else {
-    //   throw new Error(error.message);
-    // }
   }
 };
 
@@ -103,12 +97,6 @@ export const updateEvent = async (id, data, token) => {
     return event.data;
   } catch (error) {
     errorHelper(error);
-    // if (error.response && error.response.data && error.response.data.errors) {
-    //   const errorMessage = error.response.data.errors[0].message;
-    //   throw new Error(errorMessage);
-    // } else {
-    //   throw new Error(error.message);
-    // }
   }
 };
 
@@ -117,12 +105,7 @@ export const deleteEvent = async (id, token) => {
     const event = await api.removeEvent(id, token);
     return event.data;
   } catch (error) {
-    if (error.response && error.response.data && error.response.data.errors) {
-      const errorMessage = error.response.data.errors[0].message;
-      throw new Error(errorMessage);
-    } else {
-      throw new Error(error.message);
-    }
+    errorHelper(error);
   }
 };
 
@@ -130,6 +113,42 @@ export const createQRCode = async (id, token) => {
   try {
     const qr = await api.generateQRCode(id, token);
     return qr.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const getEventLogs = async (id, token) => {
+  try {
+    const res = await api.getUserEventLogs(id, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const eventCheckIn = async (id, token) => {
+  try {
+    const res = await api.checkInToEvent(id, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const addTimeStamps = async (id, token) => {
+  try {
+    const res = await api.updateEventTimeStamps(id, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const connectionStatus = async () => {
+  try {
+    const res = await api.wifiConnectionStatus();
+    return res.data;
   } catch (error) {
     errorHelper(error);
   }
