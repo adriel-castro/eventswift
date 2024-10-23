@@ -15,4 +15,4 @@ const QRCodeSchema = mongoose.Schema({
   },
 });
 
-module.exports = QRCode = mongoose.model("qrcodes", QRCodeSchema);
+module.exports = QRCodeModel = mongoose.model("qrcodes", QRCodeSchema);

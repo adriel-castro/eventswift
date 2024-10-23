@@ -222,7 +222,7 @@ const getMe = async (req, res) => {
 
 const generateToken = (id, pass) => {
   return jwt.sign({ user: { id, password: pass } }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "10d",
   });
 };
 
