@@ -3,6 +3,7 @@ import React from "react";
 import { Tabs, Redirect } from "expo-router";
 import { icons } from "../../constants";
 import { StatusBar } from "expo-status-bar";
+import Icon from "react-native-vector-icons/FontAwesome5";
 
 const TabIcon = ({ icon, color, name, focused }) => {
   return (
@@ -28,13 +29,15 @@ const TabsLayout = () => {
     <>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: "#FFA001",
+          tabBarActiveTintColor: "#FEA13D",
           tabBarInactiveTintColor: "#CDCDE0",
           tabBarShowLabel: false,
           tabBarStyle: {
-            backgroundColor: "#161622",
+            // backgroundColor: "#161622",
+            backgroundColor: "#016738",
             borderTopWidth: 1,
-            borderTopColor: "#232533",
+            // borderTopColor: "#232533",
+            borderTopColor: "#F3F5AD",
             height: 84,
           },
         }}
@@ -51,6 +54,34 @@ const TabsLayout = () => {
                 name="Home"
                 focused={focused}
               />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="attendance"
+          options={{
+            title: "Attendance",
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <>
+                <View className="items-center justify-center gap-2">
+                  <Icon
+                    name="calendar-check"
+                    size={25}
+                    color={color}
+                    className="w-6 h-6"
+                    resizeMode="contain"
+                  />
+                  <Text
+                    className={`${
+                      focused ? "font-psemibold" : "font-pregular"
+                    } text-xs`}
+                    style={{ color: color }}
+                  >
+                    Attendance
+                  </Text>
+                </View>
+              </>
             ),
           }}
         />
@@ -101,7 +132,7 @@ const TabsLayout = () => {
         />
       </Tabs>
 
-      <StatusBar backgroundColor="#161622" style="light" />
+      <StatusBar backgroundColor="#016738" style="light" />
     </>
   );
 };

@@ -1,15 +1,15 @@
 import { Alert } from "react-native";
 import { useEffect, useState } from "react";
 
-const useRefetch = (fn) => {
+const useRefresh = (fn) => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const res = await fn();
-      setData(res);
+      setData(res.data);
     } catch (error) {
       Alert.alert("Error", error.message);
     } finally {
@@ -26,4 +26,4 @@ const useRefetch = (fn) => {
   return { data, loading, refetch };
 };
 
-export default useRefetch;
+export default useRefresh;

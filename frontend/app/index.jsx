@@ -6,9 +6,10 @@ import { Redirect, router } from "expo-router";
 import { useGlobalContext } from "../context/GlobalProvider";
 
 const App = () => {
-  const { isLoading, isLoggedIn } = useGlobalContext();
+  const { isLoading, isLoggedIn, networkStatus } = useGlobalContext();
 
-  if (!isLoading && isLoggedIn) return <Redirect href="/home" />;
+  if (!isLoading && isLoggedIn && networkStatus !== null)
+    return <Redirect href="/home" />;
 
   return (
     <SafeAreaView className="bg-primary h-full">

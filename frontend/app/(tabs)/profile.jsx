@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Image, FlatList, TouchableOpacity } from "react-native";
 
 import { icons } from "../../constants";
-import useRefetch from "../../lib/useRefetch";
+import useRefresh from "../../lib/useRefresh";
 import { getUserPosts, signOut } from "../../lib/db";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import InfoBox from "../../components/InfoBox";
@@ -11,7 +11,7 @@ import InfoBox from "../../components/InfoBox";
 
 const Profile = () => {
   const { user, setUser, setIsLoggedIn } = useGlobalContext();
-  // const { data: posts } = useRefetch(() => getUserPosts(user.$id));
+  // const { data: posts } = useRefresh(() => getUserPosts(user.$id));
 
   const logout = async () => {
     await signOut();
