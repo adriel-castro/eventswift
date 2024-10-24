@@ -14,6 +14,7 @@ const eventsRoute = require("./routes/events");
 const qrCodeRoute = require("./routes/qrcode.routes");
 const attendanceRoute = require("./routes/attendance");
 const wifiRoute = require("./routes/wifiCheck");
+const feedbackRoute = require("./routes/feedback");
 
 const db = process.env.MONGO_URI;
 console.log(db);
@@ -30,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Initialize wifi module
 wifi.init({
-  iface: null, // network interface, if specified will be used. Defaults to first found.
+  iface: null,
 });
 
 app.get("/", (req, res) => {
@@ -45,6 +46,7 @@ app.use("/api/events", eventsRoute);
 app.use("/api/qrcode", qrCodeRoute);
 app.use("/api/attendance", attendanceRoute);
 app.use("/api/wifi", wifiRoute);
+app.use("/api/feedback", feedbackRoute);
 
 app.use(errorHandler);
 
