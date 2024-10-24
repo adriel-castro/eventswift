@@ -4,8 +4,9 @@ import { connectionStatus, signOut } from "./db";
 import { router } from "expo-router";
 
 const useNetworkChecker = () => {
-  const [networkStatus, setNetworkStatus] = useState(null); // Change to null to handle undefined
+  const [networkStatus, setNetworkStatus] = useState(null);
   const [isNetworkLoading, setIsNetworkLoading] = useState(false);
+  let intervalId;
 
   useEffect(() => {
     const wifiConnection = async () => {
@@ -17,20 +18,35 @@ const useNetworkChecker = () => {
         if (wifi && wifi.data) {
           setNetworkStatus(wifi.data);
         } else {
-          setNetworkStatus(null); // If no wifi data, set null
+          setNetworkStatus(null);
+          Alert.alert("Warning", "No Wi-Fi data received.");
         }
       } catch (error) {
         Alert.alert("Error", error.message);
         router.replace("/login");
+        clearInterval(intervalId);
       } finally {
         setIsNetworkLoading(false);
       }
     };
 
+    // Initial check
     wifiConnection();
+
+    intervalId = setInterval(() => {
+      wifiConnection();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
-  return { isNetworkLoading, networkStatus };
+  const handleLogout = () => {
+    clearInterval(intervalId);
+    // signOut();
+    router.replace("/login");
+  };
+
+  return { isNetworkLoading, networkStatus, handleLogout };
 };
 
 export default useNetworkChecker;

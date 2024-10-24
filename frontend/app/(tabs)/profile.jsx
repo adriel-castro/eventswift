@@ -3,23 +3,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Image, FlatList, TouchableOpacity } from "react-native";
 
 import { icons } from "../../constants";
-import useRefresh from "../../lib/useRefresh";
-import { getUserPosts, signOut } from "../../lib/db";
+import { signOut } from "../../lib/db";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import InfoBox from "../../components/InfoBox";
+// import useRefresh from "../../lib/useRefresh";
 // import EmptyState from "../../components/EmptyState";
 
 const Profile = () => {
-  const { user, setUser, setIsLoggedIn } = useGlobalContext();
+  const { user, logout } = useGlobalContext();
   // const { data: posts } = useRefresh(() => getUserPosts(user.$id));
-
-  const logout = async () => {
-    await signOut();
-    setUser(null);
-    setIsLoggedIn(false);
-
-    router.replace("/login");
-  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
