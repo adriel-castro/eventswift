@@ -46,9 +46,7 @@ export const getCurrentUser = async (token) => {
 
 export const signOut = async () => {
   try {
-    const session = await AsyncStorage.removeItem("access_token");
-
-    return session;
+    await AsyncStorage.removeItem("access_token");
   } catch (error) {
     if (error.response && error.response.data && error.response.data.errors) {
       const errorMessage = error.response.data.errors[0].message;

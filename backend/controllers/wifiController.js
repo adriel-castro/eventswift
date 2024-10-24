@@ -21,7 +21,7 @@ const checkWifiConnection = async (req, res) => {
         return res.status(401).json({
           status: false,
           data: [],
-          errors: { message: "Not connected to the specific Wi-Fi." },
+          errors: { message: "Connected to a different Wi-Fi network." },
         });
       }
     } else {
