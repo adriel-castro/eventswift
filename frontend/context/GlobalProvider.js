@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getCurrentUser, signOut } from "../lib/db";
-import useNetworkChecker from "../lib/useNetworkChecker";
 import { router } from "expo-router";
 import { Alert } from "react-native";
+import { getCurrentUser, signOut } from "../lib/db";
+import useNetworkChecker from "../lib/useNetworkChecker";
+import useTimestamps from "../lib/useTimestamps";
+import useDepartments from "../lib/useDepartments";
 
 const GlobalContext = createContext();
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -14,7 +16,11 @@ const GlobalProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [accessToken, setAccessToken] = useState("");
 
+  // custom Hooks
   const { networkStatus, handleLogout } = useNetworkChecker();
+  const { ongoingEvent } = useTimestamps(accessToken, networkStatus);
+  const { departments } = useDepartments(networkStatus);
+
   const signalLevel = networkStatus
     ? networkStatus.signal_level
     : null ?? "something";
@@ -30,8 +36,6 @@ const GlobalProvider = ({ children }) => {
       Alert.alert("Error", error.message);
     }
   };
-
-  // console.log("Current networkStatus:", networkStatus);
 
   useEffect(() => {
     if (signalLevel) {
@@ -97,6 +101,8 @@ const GlobalProvider = ({ children }) => {
         accessToken,
         networkStatus,
         logout,
+        departments,
+        ongoingEvent,
       }}
     >
       {children}

@@ -18,11 +18,11 @@ const EventSchema = mongoose.Schema({
     contact: { type: String },
   },
   isMandatory: { type: Boolean, default: false },
-  status: {
-    type: String,
-    default: "Not Started",
-    enum: ["Not Started", "Already Started", "Event Finished"],
-  },
+  // status: {
+  //   type: String,
+  //   default: "Not Started",
+  //   enum: ["Not Started", "Already Started", "Event Finished"],
+  // },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",

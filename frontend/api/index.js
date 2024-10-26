@@ -20,11 +20,11 @@ export const authMe = (accessToken) => {
 };
 
 export const getAllDepartments = () => {
-  return axios.get(`${url}/departments/`);
+  return axios.get(`${url}/departments`);
 };
 
 export const getAllEvents = (accessToken) => {
-  return axios.get(`${url}/events/`, {
+  return axios.get(`${url}/events`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -84,13 +84,25 @@ export const checkInToEvent = (eventId, accessToken) => {
 };
 
 export const updateEventTimeStamps = (eventId, accessToken) => {
-  return axios.put(`${url}/attendance/timestamp-logs/${eventId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  return axios.put(
+    `${url}/attendance/timestamp-logs/${eventId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 };
 
 export const wifiConnectionStatus = () => {
   return axios.get(`${url}/wifi/check`);
+};
+
+export const addEventFeedback = (eventId, accessToken, data) => {
+  return axios.post(`${url}/feedback/${eventId}`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 };

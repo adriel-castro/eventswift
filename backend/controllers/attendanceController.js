@@ -41,7 +41,7 @@ const checkInToEvent = async (req, res) => {
       return res.status(400).json({
         status: false,
         data: [],
-        errors: { message: "You already checked in to the event!" },
+        errors: { message: "You cannot joined the event again!" },
       });
     }
 

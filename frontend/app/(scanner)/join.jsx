@@ -1,20 +1,22 @@
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import CustomButton from "../../components/CustomButton";
-import Icon from "react-native-vector-icons/FontAwesome5";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/FontAwesome5";
+
+import CustomButton from "../../components/CustomButton";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { eventCheckIn } from "../../lib/db";
 import Loader from "../../components/reusables/Loader";
 
-const CheckIn = () => {
+const JoinEvent = () => {
   // const [facing, setFacing] = useState("back");
   const facing = "back";
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { accessToken } = useGlobalContext();
+  const { accessToken, setOngoingEvent } = useGlobalContext();
 
   // Camera permissions are still loading.
   if (!permission) {
@@ -41,6 +43,14 @@ const CheckIn = () => {
   //   setFacing((current) => (current === "back" ? "front" : "back"));
   // };
 
+  const storeData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (error) {
+      console.log("error settingItem to localStorage", error.message);
+    }
+  };
+
   const handleBarCodeScanned = async ({ data }) => {
     const eventData = typeof data === "string" ? JSON.parse(data) : data;
     const eventId = eventData._id;
@@ -51,6 +61,9 @@ const CheckIn = () => {
       // console.log(checkIn.data);
 
       if (checkIn.data) {
+        // setOngoingEvent(checkIn.data);
+        await storeData("joined_event", JSON.stringify(checkIn.data));
+
         Alert.alert("Success", `You joined the ${checkIn.data.event.name}!`);
         router.back();
       }
@@ -132,4 +145,4 @@ const CheckIn = () => {
   );
 };
 
-export default CheckIn;
+export default JoinEvent;

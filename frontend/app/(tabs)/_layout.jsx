@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Platform } from "react-native";
 import React from "react";
 import { Tabs, Redirect } from "expo-router";
 import { icons } from "../../constants";
@@ -39,6 +39,7 @@ const TabsLayout = () => {
             // borderTopColor: "#232533",
             borderTopColor: "#F3F5AD",
             height: 84,
+            paddingTop: Platform.OS === "ios" ? 20 : 0,
           },
         }}
       >
@@ -54,6 +55,34 @@ const TabsLayout = () => {
                 name="Home"
                 focused={focused}
               />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="events"
+          options={{
+            title: "Events",
+            headerShown: false,
+            tabBarIcon: ({ color, focused }) => (
+              <>
+                <View className="items-center justify-center gap-2">
+                  <Icon
+                    name="calendar"
+                    size={25}
+                    color={color}
+                    className="w-6 h-6"
+                    resizeMode="contain"
+                  />
+                  <Text
+                    className={`${
+                      focused ? "font-psemibold" : "font-pregular"
+                    } text-xs`}
+                    style={{ color: color }}
+                  >
+                    Events
+                  </Text>
+                </View>
+              </>
             ),
           }}
         />
@@ -132,7 +161,8 @@ const TabsLayout = () => {
         />
       </Tabs>
 
-      <StatusBar backgroundColor="#016738" style="light" />
+      {/* <StatusBar backgroundColor="#016738" style="light" /> */}
+      <StatusBar backgroundColor="#016738" />
     </>
   );
 };

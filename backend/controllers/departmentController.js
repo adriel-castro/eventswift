@@ -5,7 +5,7 @@ const getAllDepartments = async (req, res) => {
   try {
     let department = await Department.find();
 
-    return res.status(200).json({ status: true, data: department, errors: [] });
+    return res.json({ status: true, data: department, errors: [] });
   } catch (error) {
     return res.status(500).json({
       status: false,
