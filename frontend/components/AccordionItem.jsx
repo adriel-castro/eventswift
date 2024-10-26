@@ -1,96 +1,7 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
-import Icon from "react-native-vector-icons/FontAwesome5";
-import CustomButton from "./CustomButton";
-import { router } from "expo-router";
-
-// Helper function to format the date to 'YYYY-MM-DD'
-const formatDate = (date) => new Date(date).toISOString().split("T")[0];
-
-// Accordion for displaying event details
-const EventAccordion = ({ event, isOpen, onToggle }) => (
-  <View>
-    <TouchableOpacity
-      className="flex flex-row items-center justify-between w-full p-3 border border-gray-200 rounded-lg"
-      onPress={onToggle}
-    >
-      <Text>{event.name}</Text>
-      <Icon
-        name="caret-down"
-        size={15}
-        color="gray"
-        style={{ transform: [{ rotate: isOpen ? "180deg" : "0deg" }] }}
-      />
-    </TouchableOpacity>
-
-    {isOpen && (
-      <View className="p-3 border-secondary border-2">
-        <Text>Date: {formatDate(event.eventDate)}</Text>
-        <Text>
-          Time: {event.startTime} - {event.endTime}
-        </Text>
-        <Text>Location: {event.location}</Text>
-        <Text>Description: {event.description}</Text>
-        <Text>Organizer: {event.organizer.name}</Text>
-        <Text>Contact Info: {event.organizer.contact || "N/A"}</Text>
-        <Text>Mandatory: {event.isMandatory ? "Yes" : "No"}</Text>
-        <Text>Status: {event.status}</Text>
-
-        <CustomButton
-          title="Generate QR"
-          handlePress={() =>
-            router.push({ pathname: "/qrcode", params: { eventId: event._id } })
-          }
-          containerStyles="mt-5"
-        />
-        <CustomButton
-          title="Check In"
-          handlePress={() => router.push("/checkin")}
-          containerStyles="mt-5"
-        />
-      </View>
-    )}
-  </View>
-);
-
-// Accordion for displaying department and its events
-const DepartmentAccordion = ({ department, events }) => {
-  const [isDepartmentOpen, setIsDepartmentOpen] = useState(false);
-  const [openEventIndex, setOpenEventIndex] = useState(null);
-
-  const toggleEvent = (index) => {
-    setOpenEventIndex(openEventIndex === index ? null : index);
-  };
-
-  return (
-    <View>
-      <TouchableOpacity
-        className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
-        onPress={() => setIsDepartmentOpen(!isDepartmentOpen)}
-      >
-        <Text>{department}</Text>
-        <Icon
-          name="caret-down"
-          size={15}
-          color="gray"
-          style={{
-            transform: [{ rotate: isDepartmentOpen ? "180deg" : "0deg" }],
-          }}
-        />
-      </TouchableOpacity>
-
-      {isDepartmentOpen &&
-        events.map((event, index) => (
-          <EventAccordion
-            key={index}
-            event={event}
-            isOpen={openEventIndex === index}
-            onToggle={() => toggleEvent(index)}
-          />
-        ))}
-    </View>
-  );
-};
+import { View, Text } from "react-native";
+import React from "react";
+import moment from "moment";
+import DepartmentAccordion from "./DepartmentAccordion";
 
 // Group events by department
 const groupByDepartment = (events) => {
@@ -105,16 +16,75 @@ const groupByDepartment = (events) => {
 
 // Main component for today's and upcoming events
 const AccordionItem = ({ eventsData }) => {
-  const today = formatDate(new Date());
-  const todaysEvents = eventsData.filter(
-    (event) => formatDate(event.eventDate) === today
-  );
-  const upcomingEvents = eventsData.filter(
-    (event) => formatDate(event.eventDate) > today
-  );
+  const today = moment().format("YYYY-MM-DD");
+  const currentTime = moment();
+  // Today's events: Events happening today and not yet ended
+  const todaysEvents = eventsData
+    .filter((event) => {
+      const eventDate = moment(event.eventDate).format("YYYY-MM-DD");
+      const endTime = moment(
+        `${eventDate} ${event.endTime}`,
+        "YYYY-MM-DD h:mm A"
+      );
+
+      return eventDate === today && currentTime.isBefore(endTime);
+    })
+    .sort((a, b) => {
+      const dateComparison = moment(a.eventDate).diff(moment(b.eventDate));
+      if (dateComparison !== 0) return dateComparison;
+
+      const timeComparison = moment(a.startTime, "h:mm A").diff(
+        moment(b.startTime, "h:mm A")
+      );
+      if (timeComparison !== 0) return timeComparison;
+
+      return a.department.localeCompare(b.department);
+    });
+
+  // Upcoming events: Events in the future, sorted by date, time, and department
+  const upcomingEvents = eventsData
+    .filter((event) => moment(event.eventDate).isAfter(today))
+    .sort((a, b) => {
+      const dateComparison = moment(a.eventDate).diff(moment(b.eventDate));
+      if (dateComparison !== 0) return dateComparison;
+
+      const timeComparison = moment(a.startTime, "h:mm A").diff(
+        moment(b.startTime, "h:mm A")
+      );
+      if (timeComparison !== 0) return timeComparison;
+
+      return a.department.localeCompare(b.department);
+    });
+
+  // Past events: Events that have already ended, sorted by descending date, descending time, and ascending department
+  const pastEvents = eventsData
+    .filter((event) => {
+      const eventDate = moment(event.eventDate).format("YYYY-MM-DD");
+      const endTime = moment(
+        `${eventDate} ${event.endTime}`,
+        "YYYY-MM-DD h:mm A"
+      );
+
+      return (
+        eventDate < today ||
+        (eventDate === today && currentTime.isAfter(endTime))
+      );
+    })
+    .sort((a, b) => {
+      const dateComparison = moment(b.eventDate).diff(moment(a.eventDate)); // Descending by date
+      if (dateComparison !== 0) return dateComparison;
+
+      const timeComparison = moment(b.startTime, "h:mm A").diff(
+        moment(a.startTime, "h:mm A")
+      ); // Descending by time
+      if (timeComparison !== 0) return timeComparison;
+
+      return a.department.localeCompare(b.department); // Ascending by department
+    });
 
   const groupedTodaysEvents = groupByDepartment(todaysEvents);
   const groupedUpcomingEvents = groupByDepartment(upcomingEvents);
+  const groupedPastEvents = groupByDepartment(pastEvents);
 
   return (
     <View className="mb-4">
@@ -145,6 +115,22 @@ const AccordionItem = ({ eventsData }) => {
               key={index}
               department={department}
               events={groupedUpcomingEvents[department]}
+            />
+          ))}
+        </>
+      )}
+
+      {/* Past Events Section */}
+      {pastEvents.length > 0 && (
+        <>
+          <Text className="text-xl mt-5 text-semibold text-secondary font-psemibold">
+            Past Events
+          </Text>
+          {Object.keys(groupedPastEvents).map((department, index) => (
+            <DepartmentAccordion
+              key={index}
+              department={department}
+              events={groupedPastEvents[department]}
             />
           ))}
         </>

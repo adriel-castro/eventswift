@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const Event = require("../models/Events");
 const User = require("../models/Users");
+const moment = require("moment");
 
 const getAllEvents = async (req, res) => {
   try {
@@ -59,6 +60,17 @@ const addEvent = async (req, res) => {
       // status,
     } = req.body;
 
+    // const manilaTime = moment.tz("Asia/Manila");
+    // const utcDate = moment.utc(eventDate); // UTC date
+    // const manilaDate = utcDate.tz("Asia/Manila").format("YYYY-MM-DD");
+
+    // const start = moment.utc(startTime);
+    // const end = moment.utc(endTime);
+    // const startManilaTime = start.tz("Asia/Manila").format("h:mm A");
+    // const endManilaTime = end.tz("Asia/Manila").format("h:mm A");
+
+    // console.log("UTC DateTime", eventDate, startTime, endTime);
+
     let event = await Event.findOne({
       $and: [
         { name: name },
@@ -85,7 +97,6 @@ const addEvent = async (req, res) => {
     event.organizer.name = organizer;
     event.organizer.contact = contact;
     event.isMandatory = isMandatory ?? false;
-    event.status = "Not Started";
     event.createdBy = req.user._id;
     await event.save();
 
@@ -144,7 +155,6 @@ const updateEvent = async (req, res) => {
       organizer,
       contact,
       isMandatory,
-      status,
     } = req.body;
 
     findEvent.name = name;
@@ -157,7 +167,6 @@ const updateEvent = async (req, res) => {
     findEvent.organizer.name = organizer;
     findEvent.organizer.contact = contact;
     findEvent.isMandatory = isMandatory ?? false;
-    findEvent.status = status ?? "Not Started";
     findEvent.updatedAt = Date.now();
     findEvent.updatedBy = req.user._id;
     await findEvent.save();

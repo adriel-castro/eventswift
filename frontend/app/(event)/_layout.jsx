@@ -1,18 +1,18 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-const ScannerLayout = () => {
+const FeedbackLayout = () => {
   return (
     <>
       <Stack>
         <Stack.Screen
-          name="join"
+          name="feedback"
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="qrcode"
+          name="update"
           options={{
             headerShown: false,
           }}
@@ -24,4 +24,4 @@ const ScannerLayout = () => {
   );
 };
 
-export default ScannerLayout;
+export default FeedbackLayout;

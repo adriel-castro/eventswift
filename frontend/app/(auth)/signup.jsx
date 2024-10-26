@@ -2,13 +2,11 @@ import {
   View,
   Text,
   SafeAreaView,
-  ScrollView,
   Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
   FlatList,
-  KeyboardAvoidingViewComponent,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Link, router } from "expo-router";
@@ -16,7 +14,7 @@ import { Link, router } from "expo-router";
 import { images } from "../../constants";
 import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
-import { signUpUser, getDepartments } from "../../lib/db";
+import { signUpUser } from "../../lib/db";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import DropdownField from "../../components/DropdownField";
 
@@ -33,36 +31,12 @@ const SignUp = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser, setIsLoggedIn } = useGlobalContext();
+  const { setUser, setIsLoggedIn, departments: deptData } = useGlobalContext();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [open, setOpen] = useState(false);
-  const [departments, setDepartments] = useState([]);
-
-  useEffect(() => {
-    const getDepartment = async () => {
-      setIsLoading(true);
-      try {
-        const dept = await getDepartments();
-        let allDepartment = [];
-        dept.data.forEach((item) => {
-          allDepartment.push({
-            value: item.name,
-            label: item.name,
-          });
-        });
-
-        setDepartments(allDepartment);
-      } catch (error) {
-        console.log(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getDepartment();
-  }, []);
+  const [departments, setDepartments] = useState(deptData);
 
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });

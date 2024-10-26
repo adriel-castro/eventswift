@@ -47,6 +47,7 @@ export const getCurrentUser = async (token) => {
 export const signOut = async () => {
   try {
     await AsyncStorage.removeItem("access_token");
+    // await AsyncStorage.removeItem("joined_event");
   } catch (error) {
     if (error.response && error.response.data && error.response.data.errors) {
       const errorMessage = error.response.data.errors[0].message;
@@ -58,15 +59,20 @@ export const signOut = async () => {
 };
 
 export const getDepartments = async () => {
+  
   try {
-    const department = await api.getAllDepartments();
-    return department.data;
+    const res = await api.getAllDepartments();
+    const department = res?.data;
+    return department;
   } catch (error) {
-    if (error.response && error.response.data && error.response.data.errors) {
-      const errorMessage = error.response.data.errors[0].message;
+    console.log("dept error", error)
+    let errorMessage;
+    if (error?.response?.data?.errors?.length > 0) {
+      errorMessage = error?.respons?.data?.errors[0]?.message;
       throw new Error(errorMessage);
-    } else {
-      throw new Error(error.message);
+    } else if (error?.response?.data?.errors) {
+      errorMessage = error?.response?.data?.errors?.message;
+      throw new Error(errorMessage);
     }
   }
 };
@@ -146,6 +152,15 @@ export const addTimeStamps = async (id, token) => {
 export const connectionStatus = async () => {
   try {
     const res = await api.wifiConnectionStatus();
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const createFeedback = async (eventId, token, data) => {
+  try {
+    const res = await api.addEventFeedback(eventId, token, data);
     return res.data;
   } catch (error) {
     errorHelper(error);

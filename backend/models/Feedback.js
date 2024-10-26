@@ -1,22 +1,24 @@
 const mongoose = require("mongoose");
 
 const FeedbackSchema = mongoose.Schema({
-  event: { type: mongoose.Schema.Types.ObjectId, ref: "events" },
-  attendance: {
-    attendee: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "user",
-    },
-    logs: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "attendance",
-    },
-    isPresent: { type: Boolean },
+  event: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "events",
+    required: true,
   },
+  attendee: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "user",
+  },
+  attendanceLogs: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "attendance",
+  },
+  isPresent: { type: Boolean, required: true },
   feedback: {
-    rating: { type: Number, min: 1, max: 5 },
+    rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String },
   },
   createdAt: { type: Date, default: Date.now },
