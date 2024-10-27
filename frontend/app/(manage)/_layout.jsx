@@ -1,18 +1,18 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-const FeedbackLayout = () => {
+const ManageLayout = () => {
   return (
     <>
       <Stack>
         <Stack.Screen
-          name="feedback"
+          name="users"
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="update"
+          name="departments"
           options={{
             headerShown: false,
           }}
@@ -24,4 +24,4 @@ const FeedbackLayout = () => {
   );
 };
 
-export default FeedbackLayout;
+export default ManageLayout;

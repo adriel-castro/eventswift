@@ -11,6 +11,15 @@ export const signup = (data) => {
   return axios.post(`${url}/auth/signup`, data);
 };
 
+export const getAllUsers = (accessToken) => {
+  return axios.get(`${url}/users`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+
 export const authMe = (accessToken) => {
   return axios.get(`${url}/auth/me`, {
     headers: {
@@ -21,6 +30,14 @@ export const authMe = (accessToken) => {
 
 export const getAllDepartments = () => {
   return axios.get(`${url}/departments`);
+};
+
+export const addNewDepartment = (data, accessToken) => {
+  return axios.post(`${url}/departments/add`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 };
 
 export const getAllEvents = (accessToken) => {

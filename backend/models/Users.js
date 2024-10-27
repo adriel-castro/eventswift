@@ -29,11 +29,9 @@ const UserSchema = new Schema({
   birthDate: { type: Date },
   address: { type: String },
   role: { type: String, default: "user", ref: "roles" },
-  address: { type: String },
   department: { type: String, ref: "departments" },
   year: { type: String },
   avatar: { type: String, dafault: "" },
-  // accessToken: { type: String, required: true },
   isActive: {
     type: Boolean,
     default: true,

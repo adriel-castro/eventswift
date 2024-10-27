@@ -44,6 +44,20 @@ export const getCurrentUser = async (token) => {
   }
 };
 
+export const getUsers = async (token) => {
+  try {
+    const user = await api.getAllUsers(token);
+    return user.data;
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.errors) {
+      const errorMessage = error.response.data.errors[0].message;
+      throw new Error(errorMessage);
+    } else {
+      throw new Error(error.message);
+    }
+  }
+};
+
 export const signOut = async () => {
   try {
     await AsyncStorage.removeItem("access_token");
@@ -59,13 +73,12 @@ export const signOut = async () => {
 };
 
 export const getDepartments = async () => {
-  
   try {
     const res = await api.getAllDepartments();
     const department = res?.data;
     return department;
   } catch (error) {
-    console.log("dept error", error)
+    console.log("dept error", error);
     let errorMessage;
     if (error?.response?.data?.errors?.length > 0) {
       errorMessage = error?.respons?.data?.errors[0]?.message;
@@ -74,6 +87,15 @@ export const getDepartments = async () => {
       errorMessage = error?.response?.data?.errors?.message;
       throw new Error(errorMessage);
     }
+  }
+};
+
+export const createNewDepartment = async (data, token) => {
+  try {
+    const event = await api.addNewDepartment(data, token);
+    return event.data;
+  } catch (error) {
+    errorHelper(error);
   }
 };
 

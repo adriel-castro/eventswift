@@ -42,22 +42,6 @@ const SignUp = () => {
     setForm({ ...form, [field]: value });
   };
 
-  // Handle date change
-  const handleDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setForm({
-        ...form,
-        birthDate: selectedDate,
-      });
-    }
-  };
-
-  // Show the date picker
-  // const showDatepicker = () => {
-  //   setShowDatePicker(true);
-  // };
-
   const submit = async () => {
     if (
       form.email === "" ||
@@ -142,23 +126,6 @@ const SignUp = () => {
                 handleChangeText={(e) => handleChange("lastName", e)}
                 otherStyles="mt-5"
               />
-
-              {/* <FormField
-                title="Birth Date"
-                value={form.birthDate}
-                handleChangeText={handleDateChange}
-                otherStyles="mt-5"
-                showDatePicker={showDatePicker}
-                toggleDatePicker={() => setShowDatePicker(true)}
-              />
-
-              <FormField
-                title="Department"
-                value={form.department}
-                placeholder="Select Department"
-                handleChangeText={(e) => handleChange("department", e)}
-                otherStyles="mt-5"
-              /> */}
 
               <DropdownField
                 title="Department"

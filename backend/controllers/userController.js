@@ -3,7 +3,9 @@ const User = require("../models/Users");
 
 const getAllUsers = async (req, res) => {
   try {
-    let users = await User.find({ isActive: true });
+    let users = await User.find({ isActive: true })
+      .select("-createdAt -password")
+      .lean();
 
     return res.status(200).json({ status: true, data: users, errors: [] });
   } catch (error) {
