@@ -1,11 +1,11 @@
-import { Text, ScrollView, RefreshControl } from "react-native";
+import { Text, ScrollView, RefreshControl, View } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Accordion from "../../components/Accordion";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { getEvents } from "../../lib/db";
 import useRefresh from "../../lib/useRefresh";
 import Loader from "../../components/reusables/Loader";
+import AccordionItem from "../../components/AccordionItem";
 
 const Home = () => {
   const { accessToken } = useGlobalContext();
@@ -32,10 +32,9 @@ const Home = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <Text className="text-2xl px-4 mt-10 text-semibold text-secondary font-psemibold">
-            Events
-          </Text>
-          <Accordion eventsData={eventsData} />
+          <View className="p-4">
+            <AccordionItem eventsData={eventsData} />
+          </View>
         </ScrollView>
       )}
     </SafeAreaView>

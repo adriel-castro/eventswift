@@ -86,7 +86,7 @@ export const getEvents = async (token) => {
   }
 };
 
-export const createEvent = async (data, token) => {
+export const createNewEvent = async (data, token) => {
   try {
     const event = await api.addEvent(data, token);
     return event.data;

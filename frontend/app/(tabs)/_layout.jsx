@@ -129,7 +129,7 @@ const TabsLayout = () => {
             ),
           }}
         /> */}
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="create"
           options={{
             title: "Create",
@@ -143,7 +143,7 @@ const TabsLayout = () => {
               />
             ),
           }}
-        />
+        /> */}
         <Tabs.Screen
           name="profile"
           options={{
