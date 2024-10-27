@@ -52,6 +52,7 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
   const [eventEndTime, setEventEndTime] = useState(new Date()); // Default to current time
   const [eventData, setEventData] = useState(null);
   const [eventEdit, setEventEdit] = useState([]);
+
   const handleShowModal = (event) => {
     setEventData(event);
     setShowEditEvent(true);
@@ -72,31 +73,20 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
         isMandatory: eventData.isMandatory ?? false,
       };
       setEventEdit(obj);
-      setDateOfEvent(
-        moment(eventData.eventDate, "YYYY-MM-DD")
-          .utc()
-          .startOf("day")
-          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
+
+      const eDate = moment().format("YYYY-MM-DD") + "T";
+      const sTime = moment(eventData?.startTime, "h:mm A").format(
+        "HH:mm:ss.SSS[Z]"
       );
-      setEventStartTime(
-        moment(
-          eventData.eventDate + " " + eventData.startTime,
-          "YYYY-MM-DD h:mm A"
-        )
-          .utc()
-          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
+      const eTime = moment(eventData?.endTime, "h:mm A").format(
+        "HH:mm:ss.SSS[Z]"
       );
-      setEventEndTime(
-        moment(
-          eventData.eventDate + " " + eventData.endTime,
-          "YYYY-MM-DD h:mm A"
-        )
-          .utc()
-          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
-      );
+
+      setDateOfEvent(new Date(eventData.eventDate));
+      setEventStartTime(new Date(eDate + sTime));
+      setEventEndTime(new Date(eDate + eTime));
     }
   }, [eventData]);
-  // console.log(eventData);
 
   const handleChange = (field, value) => {
     setEventEdit({
@@ -105,43 +95,16 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
     });
   };
 
-  // const handleChange = (field, value) => {
-  //   setEventEdit((prevData) => ({
-  //     ...prevData,
-  //     [field]: value,
-  //   }));
-  // };
-
-  // const handleDateChange = (field, selectedDate) => {
-  //   setShowDatePicker(false);
-  //   setDateOfEvent(selectedDate);
-  // };
-
   const handleDateChange = (field, selectedDate) => {
     setShowDatePicker(false);
-    setDateOfEvent(new Date(selectedDate));
+    setDateOfEvent(selectedDate);
   };
-
-  // const handleTimeChange = (field, selectedTime) => {
-  //   console.log(selectedTime);
-  //   if (field === "startTime") {
-  //     setEventStartTime(selectedTime);
-  //   } else {
-  //     setEventEndTime(selectedTime);
-  //   }
-  // };
 
   const handleTimeChange = (field, selectedTime) => {
     if (field === "startTime") {
-      const [hours, minutes] = selectedTime.split(":");
-      const dateTime = new Date(dateOfEvent); // Using the selected date
-      dateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-      setEventStartTime(dateTime);
+      setEventStartTime(selectedTime);
     } else {
-      const [hours, minutes] = selectedTime.split(":");
-      const dateTime = new Date(dateOfEvent); // Using the selected date
-      dateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-      setEventEndTime(dateTime);
+      setEventEndTime(selectedTime);
     }
   };
 
@@ -273,7 +236,7 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
                 )}
               </Text>
 
-              {user?.role === "admin" ? (
+              {user?.role === "admin" || user?.role === "facilitator" ? (
                 <CustomButton
                   title="Generate QR"
                   handlePress={() =>
@@ -286,7 +249,7 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
                 />
               ) : null}
 
-              {ongoingEvent !== null ? null : (
+              {user?.role === "admin" || ongoingEvent !== null ? null : (
                 <CustomButton
                   title="Join Event"
                   handlePress={() => router.push("/join")}

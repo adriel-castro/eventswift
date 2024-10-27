@@ -52,7 +52,7 @@ const CreateEvent = () => {
     contact: "",
     isMandatory: false,
   });
-  // console.log("dateOfEvent", dateOfEvent);
+
   const handleChange = (field, value) => {
     setEvent({
       ...event,
