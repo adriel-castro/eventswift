@@ -129,7 +129,7 @@ const TabsLayout = () => {
             ),
           }}
         /> */}
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="create"
           options={{
             title: "Create",
@@ -143,26 +143,39 @@ const TabsLayout = () => {
               />
             ),
           }}
-        />
+        /> */}
         <Tabs.Screen
-          name="profile"
+          name="account"
           options={{
-            title: "Profile",
+            title: "Account",
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
-              <TabIcon
-                icon={icons.profile}
-                color={color}
-                name="Profile"
-                focused={focused}
-              />
+              <>
+                <View className="items-center justify-center gap-2">
+                  <Icon
+                    name="users-cog"
+                    size={25}
+                    color={color}
+                    className="w-6 h-6"
+                    resizeMode="contain"
+                  />
+                  <Text
+                    className={`${
+                      focused ? "font-psemibold" : "font-pregular"
+                    } text-xs`}
+                    style={{ color: color }}
+                  >
+                    Account
+                  </Text>
+                </View>
+              </>
             ),
           }}
         />
       </Tabs>
 
       {/* <StatusBar backgroundColor="#016738" style="light" /> */}
-      <StatusBar backgroundColor="#016738" />
+      <StatusBar backgroundColor="#016738" style="light" />
     </>
   );
 };

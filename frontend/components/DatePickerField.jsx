@@ -13,7 +13,7 @@ const DatePickerField = ({
   toggleDatePicker,
   ...props
 }) => {
-  const isDateField = title === "Event Date";
+  const isDateField = title === "Event Date" || title === "Birth Date";
   const formattedDate = value
     ? moment(value).tz("Asia/Manila").format("YYYY-MM-DD")
     : "Select a date";

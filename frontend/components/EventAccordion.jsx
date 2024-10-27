@@ -3,7 +3,6 @@ import {
   Text,
   TouchableOpacity,
   Modal,
-  Button,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -14,15 +13,15 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import CustomButton from "./CustomButton";
 import { router } from "expo-router";
 import moment from "moment";
-// import momentTZ from "moment-timezone";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "./FormField";
 import DropdownField from "./DropdownField";
 import { useGlobalContext } from "../context/GlobalProvider";
 import DatePickerField from "./DatePickerField";
 import TimePickerField from "./TimePickerField";
-import { updateEvent } from "../lib/db";
+import { deleteEvent, getEvents, updateEvent } from "../lib/db";
 import Loader from "./reusables/Loader";
+import useRefresh from "../lib/useRefresh";
 
 const EventAccordion = ({ event, isOpen, onToggle }) => {
   const {
@@ -31,10 +30,18 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
     departments: deptData,
     ongoingEvent,
   } = useGlobalContext();
+  const {
+    data: allEventsData,
+    setData: setAllEventsData,
+    setLoading,
+    refetch,
+  } = useRefresh(() => getEvents(accessToken));
   const [showEditEvent, setShowEditEvent] = useState(false);
+  const [showDeleteEvent, setShowDeleteEvent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [openDept, setOpenDept] = useState(false);
+  const [openMandatory, setOpenMandatory] = useState(false);
   const [department, setDepartment] = useState(deptData);
   const [mandatoryItems, setMandatoryItems] = useState([
     {
@@ -52,9 +59,15 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
   const [eventEndTime, setEventEndTime] = useState(new Date()); // Default to current time
   const [eventData, setEventData] = useState(null);
   const [eventEdit, setEventEdit] = useState([]);
-  const handleShowModal = (event) => {
+
+  const handleShowEditModal = (event) => {
     setEventData(event);
     setShowEditEvent(true);
+  };
+
+  const handleShowDeleteModal = (event) => {
+    setEventData(event);
+    setShowDeleteEvent(true);
   };
 
   useEffect(() => {
@@ -72,31 +85,20 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
         isMandatory: eventData.isMandatory ?? false,
       };
       setEventEdit(obj);
-      setDateOfEvent(
-        moment(eventData.eventDate, "YYYY-MM-DD")
-          .utc()
-          .startOf("day")
-          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
+
+      const eDate = moment().format("YYYY-MM-DD") + "T";
+      const sTime = moment(eventData?.startTime, "h:mm A").format(
+        "HH:mm:ss.SSS[Z]"
       );
-      setEventStartTime(
-        moment(
-          eventData.eventDate + " " + eventData.startTime,
-          "YYYY-MM-DD h:mm A"
-        )
-          .utc()
-          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
+      const eTime = moment(eventData?.endTime, "h:mm A").format(
+        "HH:mm:ss.SSS[Z]"
       );
-      setEventEndTime(
-        moment(
-          eventData.eventDate + " " + eventData.endTime,
-          "YYYY-MM-DD h:mm A"
-        )
-          .utc()
-          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
-      );
+
+      setDateOfEvent(new Date(eventData.eventDate));
+      setEventStartTime(new Date(eDate + sTime));
+      setEventEndTime(new Date(eDate + eTime));
     }
   }, [eventData]);
-  // console.log(eventData);
 
   const handleChange = (field, value) => {
     setEventEdit({
@@ -105,43 +107,16 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
     });
   };
 
-  // const handleChange = (field, value) => {
-  //   setEventEdit((prevData) => ({
-  //     ...prevData,
-  //     [field]: value,
-  //   }));
-  // };
-
-  // const handleDateChange = (field, selectedDate) => {
-  //   setShowDatePicker(false);
-  //   setDateOfEvent(selectedDate);
-  // };
-
   const handleDateChange = (field, selectedDate) => {
     setShowDatePicker(false);
-    setDateOfEvent(new Date(selectedDate));
+    setDateOfEvent(selectedDate);
   };
-
-  // const handleTimeChange = (field, selectedTime) => {
-  //   console.log(selectedTime);
-  //   if (field === "startTime") {
-  //     setEventStartTime(selectedTime);
-  //   } else {
-  //     setEventEndTime(selectedTime);
-  //   }
-  // };
 
   const handleTimeChange = (field, selectedTime) => {
     if (field === "startTime") {
-      const [hours, minutes] = selectedTime.split(":");
-      const dateTime = new Date(dateOfEvent); // Using the selected date
-      dateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-      setEventStartTime(dateTime);
+      setEventStartTime(selectedTime);
     } else {
-      const [hours, minutes] = selectedTime.split(":");
-      const dateTime = new Date(dateOfEvent); // Using the selected date
-      dateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-      setEventEndTime(dateTime);
+      setEventEndTime(selectedTime);
     }
   };
 
@@ -207,6 +182,27 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
     }
   };
 
+  const eventDelete = async () => {
+    setIsLoading(true);
+    try {
+      const res = await deleteEvent(eventData?._id, accessToken);
+      if (res.data) {
+        await refetch();
+        // const newEventData = allEventsData.filter(
+        //   (e) => e._id !== eventData?._id
+        // );
+        // setAllEventsData(newEventData);
+
+        Alert.alert("Success", "You successfully delete an event!");
+        setShowDeleteEvent(false);
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getEventStatus = (eventDate, startTime, endTime) => {
     const startDateTime = moment(eventDate).set({
       hour: moment(startTime, "h:mm A").hour(),
@@ -237,12 +233,22 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
             className="flex flex-row items-center justify-between w-full p-3 border border-gray-200 rounded-lg"
             onPress={onToggle}
           >
-            <Text>{event.name}</Text>
+            <Text className="ml-4">{event.name}</Text>
             <View className="flex flex-row gap-5">
               {user?.role === "admin" ? (
-                <TouchableOpacity onPress={() => handleShowModal(event)}>
-                  <Icon name="edit" size={20} color="#FEA13D" />
-                </TouchableOpacity>
+                <View className="flex flex-row mr-2">
+                  <TouchableOpacity
+                    className="mr-3"
+                    onPress={() => handleShowEditModal(event)}
+                  >
+                    <Icon name="edit" size={20} color="#FEA13D" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleShowDeleteModal(event)}
+                  >
+                    <Icon name="trash-alt" size={20} color="red" />
+                  </TouchableOpacity>
+                </View>
               ) : null}
               <Icon
                 name="caret-down"
@@ -273,7 +279,7 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
                 )}
               </Text>
 
-              {user?.role === "admin" ? (
+              {user?.role === "admin" || user?.role === "facilitator" ? (
                 <CustomButton
                   title="Generate QR"
                   handlePress={() =>
@@ -286,7 +292,7 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
                 />
               ) : null}
 
-              {ongoingEvent !== null ? null : (
+              {user?.role === "admin" || ongoingEvent !== null ? null : (
                 <CustomButton
                   title="Join Event"
                   handlePress={() => router.push("/join")}
@@ -326,6 +332,8 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
           )}
         </View>
       )}
+
+      {/* Update Modal */}
       <Modal
         animationType="slide" // or 'fade' for a fade effect
         transparent={true} // Makes the modal background transparent
@@ -357,8 +365,8 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
                     placeholder="Select Department"
                     handleChange={(e) => handleChange("department", e)}
                     otherStyles="mt-5"
-                    open={open}
-                    setOpen={setOpen}
+                    open={openDept}
+                    setOpen={setOpenDept}
                     items={department}
                     setItems={setDepartment}
                   />
@@ -420,8 +428,8 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
                     placeholder="Is event mandatory?"
                     handleChange={(e) => handleChange("isMandatory", e)}
                     otherStyles="mt-5"
-                    open={open}
-                    setOpen={setOpen}
+                    open={openMandatory}
+                    setOpen={setOpenMandatory}
                     items={mandatoryItems}
                     setItems={setMandatoryItems}
                   />
@@ -441,7 +449,7 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
                   />
 
                   <CustomButton
-                    title="Close"
+                    title="Cancel"
                     handlePress={() => setShowEditEvent(false)}
                     containerStyles="mt-5"
                   />
@@ -450,6 +458,35 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
               keyExtractor={(item) => item.key}
             />
           </KeyboardAvoidingView>
+        </SafeAreaView>
+      </Modal>
+
+      {/* Delete Modal */}
+      <Modal
+        animationType="slide" // or 'fade' for a fade effect
+        transparent={true} // Makes the modal background transparent
+        visible={showDeleteEvent}
+        onRequestClose={() => setShowDeleteEvent(false)}
+      >
+        <SafeAreaView className="bg-primary h-full">
+          <View className="w-full min-h-[85vh] justify-center px-4 my-6">
+            <Text className="text-2xl text-center">
+              Are you sure do you want to delete{" "}
+              <Text className="font-psemibold">{eventData?.name}</Text> on{" "}
+              {moment(eventData?.eventDate).format("LL")}?
+            </Text>
+
+            <CustomButton
+              title="Continue"
+              handlePress={eventDelete}
+              containerStyles="mt-14"
+            />
+            <CustomButton
+              title="Cancel"
+              handlePress={() => setShowDeleteEvent(false)}
+              containerStyles="mt-5"
+            />
+          </View>
         </SafeAreaView>
       </Modal>
     </>

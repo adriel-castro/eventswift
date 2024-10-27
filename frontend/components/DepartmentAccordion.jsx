@@ -17,7 +17,7 @@ const DepartmentAccordion = ({ department, events }) => {
         className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
         onPress={() => setIsDepartmentOpen(!isDepartmentOpen)}
       >
-        <Text>{department}</Text>
+        <Text>{department + " " + `(${events.length})`}</Text>
         <Icon
           name="caret-down"
           size={15}

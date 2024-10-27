@@ -23,7 +23,7 @@ const useRefresh = (fn) => {
 
   const refetch = () => fetchData();
 
-  return { data, loading, refetch };
+  return { data, setData, loading, setLoading, refetch };
 };
 
 export default useRefresh;

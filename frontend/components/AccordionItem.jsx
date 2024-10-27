@@ -2,6 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import moment from "moment";
 import DepartmentAccordion from "./DepartmentAccordion";
+import { useSegments } from "expo-router";
 
 // Group events by department
 const groupByDepartment = (events) => {
@@ -16,6 +17,8 @@ const groupByDepartment = (events) => {
 
 // Main component for today's and upcoming events
 const AccordionItem = ({ eventsData }) => {
+  const segments = useSegments();
+  const pathname = `/${segments.join("/")}`;
   const today = moment().format("YYYY-MM-DD");
   const currentTime = moment();
   // Today's events: Events happening today and not yet ended
@@ -89,11 +92,11 @@ const AccordionItem = ({ eventsData }) => {
   return (
     <View className="mb-4">
       {/* Today's Events Section */}
-      {todaysEvents.length > 0 && (
+      <Text className="text-xl mt-5 text-semibold text-secondary font-psemibold">
+        Today's Events {todaysEvents.length > 0 ? todaysEvents.length : null}
+      </Text>
+      {todaysEvents && todaysEvents.length > 0 ? (
         <>
-          <Text className="text-xl mt-5 text-semibold text-secondary font-psemibold">
-            Today's Events
-          </Text>
           {Object.keys(groupedTodaysEvents).map((department, index) => (
             <DepartmentAccordion
               key={index}
@@ -102,37 +105,47 @@ const AccordionItem = ({ eventsData }) => {
             />
           ))}
         </>
+      ) : (
+        <Text className="text-lg p-2">No available events today.</Text>
       )}
 
-      {/* Upcoming Events Section */}
-      {upcomingEvents.length > 0 && (
+      {pathname === "/(tabs)/home" ? null : (
         <>
+          {/* Upcoming Events Section */}
           <Text className="text-xl mt-5 text-semibold text-secondary font-psemibold">
-            Upcoming Events
+            Upcoming Events ({upcomingEvents.length})
           </Text>
-          {Object.keys(groupedUpcomingEvents).map((department, index) => (
-            <DepartmentAccordion
-              key={index}
-              department={department}
-              events={groupedUpcomingEvents[department]}
-            />
-          ))}
-        </>
-      )}
+          {upcomingEvents && upcomingEvents.length > 0 ? (
+            <>
+              {Object.keys(groupedUpcomingEvents).map((department, index) => (
+                <DepartmentAccordion
+                  key={index}
+                  department={department}
+                  events={groupedUpcomingEvents[department]}
+                />
+              ))}
+            </>
+          ) : (
+            <Text className="text-lg p-2">No upcoming events.</Text>
+          )}
 
-      {/* Past Events Section */}
-      {pastEvents.length > 0 && (
-        <>
+          {/* Past Events Section */}
           <Text className="text-xl mt-5 text-semibold text-secondary font-psemibold">
-            Past Events
+            Past Events ({pastEvents.length})
           </Text>
-          {Object.keys(groupedPastEvents).map((department, index) => (
-            <DepartmentAccordion
-              key={index}
-              department={department}
-              events={groupedPastEvents[department]}
-            />
-          ))}
+          {pastEvents && pastEvents.length > 0 ? (
+            <>
+              {Object.keys(groupedPastEvents).map((department, index) => (
+                <DepartmentAccordion
+                  key={index}
+                  department={department}
+                  events={groupedPastEvents[department]}
+                />
+              ))}
+            </>
+          ) : (
+            <Text className="text-lg p-2">No upcoming events.</Text>
+          )}
         </>
       )}
     </View>
