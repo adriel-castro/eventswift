@@ -14,8 +14,12 @@ router.get("/", [auth], getAllUsers);
 router.put(
   "/:id",
   [
-    [check("firstName", "FirstName is required").notEmpty()],
-    [check("lastName", "LastName is required").notEmpty()],
+    check("email", "Email should be valid").isEmail(),
+    check("studentID", "Student ID is required").notEmpty(),
+    check("firstName", "Firstname is required").notEmpty(),
+    check("lastName", "Lastname is required").notEmpty(),
+    check("department", "Department is required").notEmpty(),
+    check("year", "Year level is required").notEmpty(),
     auth,
   ],
   updateUser

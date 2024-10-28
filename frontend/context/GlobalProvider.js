@@ -98,6 +98,7 @@ const GlobalProvider = ({ children }) => {
         user,
         setUser,
         isLoading,
+        setIsLoading,
         accessToken,
         networkStatus,
         logout,

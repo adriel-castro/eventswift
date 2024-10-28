@@ -33,7 +33,7 @@ const Home = () => {
           }
         >
           <View className="p-4">
-            <AccordionItem eventsData={eventsData} />
+            <AccordionItem eventsData={eventsData} refetch={refetch} />
           </View>
         </ScrollView>
       )}

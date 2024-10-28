@@ -42,10 +42,26 @@ const updateUser = async (req, res) => {
       });
     }
 
-    let { firstName, lastName, role } = req.body;
+    let {
+      email,
+      studentID,
+      firstName,
+      lastName,
+      birthDate,
+      address,
+      department,
+      year,
+      role,
+    } = req.body;
 
+    user.email = email;
+    user.studentID = studentID;
     user.firstName = firstName;
     user.lastName = lastName;
+    user.birthDate = birthDate;
+    user.address = address;
+    user.department = department;
+    user.year = year;
     user.role = role;
     await user.save();
 
