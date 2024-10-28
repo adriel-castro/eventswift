@@ -16,7 +16,7 @@ const groupByDepartment = (events) => {
 };
 
 // Main component for today's and upcoming events
-const AccordionItem = ({ eventsData }) => {
+const AccordionItem = ({ eventsData, refetch }) => {
   const segments = useSegments();
   const pathname = `/${segments.join("/")}`;
   const today = moment().format("YYYY-MM-DD");
@@ -102,11 +102,12 @@ const AccordionItem = ({ eventsData }) => {
               key={index}
               department={department}
               events={groupedTodaysEvents[department]}
+              refetch={refetch}
             />
           ))}
         </>
       ) : (
-        <Text className="text-lg p-2">No available events today.</Text>
+        <Text className="text-lg p-2">No events today.</Text>
       )}
 
       {pathname === "/(tabs)/home" ? null : (
@@ -122,6 +123,7 @@ const AccordionItem = ({ eventsData }) => {
                   key={index}
                   department={department}
                   events={groupedUpcomingEvents[department]}
+                  refetch={refetch}
                 />
               ))}
             </>
@@ -140,6 +142,7 @@ const AccordionItem = ({ eventsData }) => {
                   key={index}
                   department={department}
                   events={groupedPastEvents[department]}
+                  refetch={refetch}
                 />
               ))}
             </>

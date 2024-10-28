@@ -11,6 +11,14 @@ export const signup = (data) => {
   return axios.post(`${url}/auth/signup`, data);
 };
 
+export const authMe = (accessToken) => {
+  return axios.get(`${url}/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
 export const getAllUsers = (accessToken) => {
   return axios.get(`${url}/users`, {
     headers: {
@@ -19,9 +27,16 @@ export const getAllUsers = (accessToken) => {
   });
 };
 
+export const editUser = (id, data, accessToken) => {
+  return axios.put(`${url}/users/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
 
-export const authMe = (accessToken) => {
-  return axios.get(`${url}/auth/me`, {
+export const removeUser = (id, accessToken) => {
+  return axios.delete(`${url}/users/${id}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -34,6 +49,22 @@ export const getAllDepartments = () => {
 
 export const addNewDepartment = (data, accessToken) => {
   return axios.post(`${url}/departments/add`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const editDepartment = (id, data, accessToken) => {
+  return axios.put(`${url}/departments/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const removeDepartment = (id, accessToken) => {
+  return axios.delete(`${url}/departments/${id}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

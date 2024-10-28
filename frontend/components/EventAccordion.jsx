@@ -19,23 +19,16 @@ import DropdownField from "./DropdownField";
 import { useGlobalContext } from "../context/GlobalProvider";
 import DatePickerField from "./DatePickerField";
 import TimePickerField from "./TimePickerField";
-import { deleteEvent, getEvents, updateEvent } from "../lib/db";
+import { deleteEvent, updateEvent } from "../lib/db";
 import Loader from "./reusables/Loader";
-import useRefresh from "../lib/useRefresh";
 
-const EventAccordion = ({ event, isOpen, onToggle }) => {
+const EventAccordion = ({ event, isOpen, onToggle, refetch }) => {
   const {
     user,
     accessToken,
     departments: deptData,
     ongoingEvent,
   } = useGlobalContext();
-  const {
-    data: allEventsData,
-    setData: setAllEventsData,
-    setLoading,
-    refetch,
-  } = useRefresh(() => getEvents(accessToken));
   const [showEditEvent, setShowEditEvent] = useState(false);
   const [showDeleteEvent, setShowDeleteEvent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -172,6 +165,8 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
       // console.log("response", res.data);
 
       if (res.data) {
+        await refetch();
+
         Alert.alert("Success", "You successfully updated an event!");
         setShowEditEvent(false);
       }
@@ -477,7 +472,7 @@ const EventAccordion = ({ event, isOpen, onToggle }) => {
             </Text>
 
             <CustomButton
-              title="Continue"
+              title="Delete"
               handlePress={eventDelete}
               containerStyles="mt-14"
             />

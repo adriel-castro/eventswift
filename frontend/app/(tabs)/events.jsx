@@ -196,7 +196,7 @@ const Events = () => {
             </View>
             {eventsData && eventsData.length <= 0 ? null : (
               <View className="p-4">
-                <AccordionItem eventsData={eventsData} />
+                <AccordionItem eventsData={eventsData} refetch={refetch} />
               </View>
             )}
           </ScrollView>

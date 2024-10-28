@@ -58,6 +58,24 @@ export const getUsers = async (token) => {
   }
 };
 
+export const updateUser = async (id, data, token) => {
+  try {
+    const res = await api.editUser(id, data, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const deleteUser = async (id, token) => {
+  try {
+    const res = await api.removeUser(id, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
 export const signOut = async () => {
   try {
     await AsyncStorage.removeItem("access_token");
@@ -92,8 +110,26 @@ export const getDepartments = async () => {
 
 export const createNewDepartment = async (data, token) => {
   try {
-    const event = await api.addNewDepartment(data, token);
-    return event.data;
+    const res = await api.addNewDepartment(data, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const updateDepartment = async (id, data, token) => {
+  try {
+    const res = await api.editDepartment(id, data, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const deleteDepartment = async (id, token) => {
+  try {
+    const res = await api.removeDepartment(id, token);
+    return res.data;
   } catch (error) {
     errorHelper(error);
   }

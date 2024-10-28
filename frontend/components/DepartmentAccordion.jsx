@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import EventAccordion from "./EventAccordion";
 
-const DepartmentAccordion = ({ department, events }) => {
+const DepartmentAccordion = ({ department, events, refetch }) => {
   const [isDepartmentOpen, setIsDepartmentOpen] = useState(false);
   const [openEventIndex, setOpenEventIndex] = useState(null);
 
@@ -35,6 +35,7 @@ const DepartmentAccordion = ({ department, events }) => {
             event={event}
             isOpen={openEventIndex === index}
             onToggle={() => toggleEvent(index)}
+            refetch={refetch}
           />
         ))}
     </View>
