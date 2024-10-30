@@ -58,6 +58,20 @@ export const getUsers = async (token) => {
   }
 };
 
+export const getUserAccount = async (id, token) => {
+  try {
+    const user = await api.getUserById(id, token);
+    return user.data;
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.errors) {
+      const errorMessage = error.response.data.errors[0].message;
+      throw new Error(errorMessage);
+    } else {
+      throw new Error(error.message);
+    }
+  }
+};
+
 export const updateUser = async (id, data, token) => {
   try {
     const res = await api.editUser(id, data, token);
@@ -198,6 +212,24 @@ export const eventCheckIn = async (id, token) => {
   }
 };
 
+export const eventAttendances = async (id, token) => {
+  try {
+    const res = await api.getAllAttendance(id, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const usersAttendance = async (token) => {
+  try {
+    const res = await api.getUserAttendance(token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
 export const addTimeStamps = async (id, token) => {
   try {
     const res = await api.updateEventTimeStamps(id, token);
@@ -219,6 +251,15 @@ export const connectionStatus = async () => {
 export const createFeedback = async (eventId, token, data) => {
   try {
     const res = await api.addEventFeedback(eventId, token, data);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const getEventsFeedback = async (eventId, token) => {
+  try {
+    const res = await api.getFeedback(eventId, token);
     return res.data;
   } catch (error) {
     errorHelper(error);

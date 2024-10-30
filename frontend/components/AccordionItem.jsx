@@ -93,7 +93,7 @@ const AccordionItem = ({ eventsData, refetch }) => {
     <View className="mb-4">
       {/* Today's Events Section */}
       <Text className="text-xl mt-5 text-semibold text-secondary font-psemibold">
-        Today's Events {todaysEvents.length > 0 ? todaysEvents.length : null}
+        Today's Events ({todaysEvents.length > 0 ? todaysEvents.length : 0})
       </Text>
       {todaysEvents && todaysEvents.length > 0 ? (
         <>
@@ -114,7 +114,8 @@ const AccordionItem = ({ eventsData, refetch }) => {
         <>
           {/* Upcoming Events Section */}
           <Text className="text-xl mt-5 text-semibold text-secondary font-psemibold">
-            Upcoming Events ({upcomingEvents.length})
+            Upcoming Events (
+            {upcomingEvents.length > 0 ? upcomingEvents.length : 0})
           </Text>
           {upcomingEvents && upcomingEvents.length > 0 ? (
             <>
@@ -133,7 +134,7 @@ const AccordionItem = ({ eventsData, refetch }) => {
 
           {/* Past Events Section */}
           <Text className="text-xl mt-5 text-semibold text-secondary font-psemibold">
-            Past Events ({pastEvents.length})
+            Past Events ({pastEvents.length > 0 ? pastEvents.length : 0})
           </Text>
           {pastEvents && pastEvents.length > 0 ? (
             <>
