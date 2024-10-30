@@ -17,7 +17,10 @@ const getEventFeedback = async (req, res) => {
       });
     }
 
-    let feedback = await Feedback.find({ event: eventId });
+    let feedback = await Feedback.find({ event: eventId }).populate({
+      path: "attendee",
+      select: "-password -createdAt",
+    });
 
     return res.status(200).json({ status: true, data: feedback, errors: [] });
   } catch (error) {

@@ -2,12 +2,49 @@ const { validationResult } = require("express-validator");
 const Event = require("../models/Events");
 const Attendance = require("../models/Attendance");
 
+const getAllUserAttendance = async (req, res) => {
+  try {
+    let attendance = await Attendance.find({
+      attendee: req.user._id,
+    });
+
+    if (!attendance) {
+      return res.status(400).json({
+        status: false,
+        data: [],
+        errors: { message: "No Attendance was found!" },
+      });
+    }
+
+    return res.status(200).json({ status: true, data: attendance, errors: [] });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      data: [],
+      errors: [{ message: error.message }],
+    });
+  }
+};
+
 const getAllUserEventAttendance = async (req, res) => {
   try {
     let attendance = await Attendance.find({
       event: req.params.eventId,
-      attendee: req.user._id,
-    });
+      // attendee: req.user._id,
+    })
+      .populate("event")
+      .populate({
+        path: "attendee",
+        select: "-password -createdAt",
+      });
+
+    if (!attendance) {
+      return res.status(400).json({
+        status: false,
+        data: [],
+        errors: { message: "No Attendance was found!" },
+      });
+    }
 
     return res.status(200).json({ status: true, data: attendance, errors: [] });
   } catch (error) {
@@ -104,4 +141,9 @@ const logTimeStamps = async (req, res) => {
   }
 };
 
-module.exports = { getAllUserEventAttendance, checkInToEvent, logTimeStamps };
+module.exports = {
+  getAllUserAttendance,
+  getAllUserEventAttendance,
+  checkInToEvent,
+  logTimeStamps,
+};
