@@ -11,6 +11,14 @@ export const signup = (data) => {
   return axios.post(`${url}/auth/signup`, data);
 };
 
+export const resetPass = (newPass, accessToken) => {
+  return axios.post(`${url}/auth/reset`, newPass, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
 export const authMe = (accessToken) => {
   return axios.get(`${url}/auth/me`, {
     headers: {
@@ -21,6 +29,14 @@ export const authMe = (accessToken) => {
 
 export const getAllUsers = (accessToken) => {
   return axios.get(`${url}/users`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const getUserById = (userId, accessToken) => {
+  return axios.get(`${url}/users/${userId}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -131,6 +147,22 @@ export const checkInToEvent = (eventId, accessToken) => {
   );
 };
 
+export const getAllAttendance = (eventId, accessToken) => {
+  return axios.get(`${url}/attendance/${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const getUserAttendance = (accessToken) => {
+  return axios.get(`${url}/attendance`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
 export const updateEventTimeStamps = (eventId, accessToken) => {
   return axios.put(
     `${url}/attendance/timestamp-logs/${eventId}`,
@@ -149,6 +181,14 @@ export const wifiConnectionStatus = () => {
 
 export const addEventFeedback = (eventId, accessToken, data) => {
   return axios.post(`${url}/feedback/${eventId}`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const getFeedback = (eventId, accessToken) => {
+  return axios.get(`${url}/feedback/${eventId}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

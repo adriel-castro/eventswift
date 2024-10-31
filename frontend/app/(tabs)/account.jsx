@@ -11,10 +11,17 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  RefreshControl,
 } from "react-native";
 
 import { icons } from "../../constants";
-import { getEvents, updateUser } from "../../lib/db";
+import {
+  getCurrentUser,
+  getEvents,
+  getUserAccount,
+  updateUser,
+  usersAttendance,
+} from "../../lib/db";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import InfoBox from "../../components/InfoBox";
 import useRefresh from "../../lib/useRefresh";
@@ -37,17 +44,25 @@ const Account = () => {
     departments: deptItems,
   } = useGlobalContext();
   const { data: eventsData } = useRefresh(() => getEvents(accessToken));
+  const { data: userAttendance } = useRefresh(() =>
+    usersAttendance(accessToken)
+  );
+  const { data: accountData, refetch: refetchUser } = useRefresh(() =>
+    getUserAccount(user?._id, accessToken)
+  );
+
   const [showEditAccount, setShowEditAccount] = useState(false);
-  const [accountData, setAccountData] = useState(null);
   const [showBirthDate, setShowBirthDate] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [openDepartment, setOpenDepartment] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [departmentItems, setDepartmentItems] = useState(deptItems);
   const [accountUpdate, setAccountUpdate] = useState([]);
 
-  const handleShowEditModal = (data) => {
-    setAccountData(data);
-    setShowEditAccount(true);
+  const onRefreshUser = async () => {
+    setRefreshing(true);
+    await refetchUser();
+    setRefreshing(false);
   };
 
   const handleChange = (field, value) => {
@@ -105,8 +120,12 @@ const Account = () => {
     try {
       const res = await updateUser(accountData._id, accountUpdate, accessToken);
 
+      // const result = await getCurrentUser(accessToken);
+      // // console.log("ressssss", result.data);
+      // setUser(result.data);
+
       if (res.data) {
-        setUser(res.data);
+        refetchUser();
 
         Alert.alert("Success", "You successfully updated your profile!");
         setAccountUpdate([]);
@@ -127,12 +146,20 @@ const Account = () => {
         <SafeAreaView className="bg-primary h-full">
           <FlatList
             data={[{ key: "account" }]}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefreshUser}
+              />
+            }
             ListHeaderComponent={() => (
               <View className="w-full flex mt-6 mb-12 px-4">
                 <View className="flex flex-row justify-end gap-4">
-                  <TouchableOpacity onPress={() => handleShowEditModal(user)}>
+                  {/* <TouchableOpacity
+                    onPress={() => handleShowEditModal(user ? user : null)}
+                  >
                     <Icon name="user-edit" size={20} color="#FEA13D" />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   <TouchableOpacity onPress={logout}>
                     <Image
                       source={icons.logout}
@@ -173,30 +200,52 @@ const Account = () => {
                       containerStyles="mr-10"
                     />
                     <InfoBox
-                      title="6"
+                      title={userAttendance.length || 0}
                       subtitle="Attended"
                       titleStyles="text-xl"
                     />
                   </View>
                 </View>
 
-                {/* Manage User */}
+                {/* Manage Account */}
                 <TouchableOpacity
                   className="flex flex-row mt-10 items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
-                  onPress={() => router.push("/users")}
+                  onPress={() => setShowEditAccount(true)}
                 >
-                  <Text>Manage Users</Text>
-                  <Icon name="users" size={20} color="#FEA13D" />
+                  <Text>Manage Account</Text>
+                  <Icon name="user-edit" size={20} color="#FEA13D" />
+                </TouchableOpacity>
+
+                {/* Manage Reports */}
+                <TouchableOpacity
+                  className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
+                  onPress={() => router.push("/reports")}
+                >
+                  <Text>Reports</Text>
+                  <Icon name="chart-line" size={20} color="#FEA13D" />
                 </TouchableOpacity>
 
                 {/* Manage User */}
-                <TouchableOpacity
-                  className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
-                  onPress={() => router.push("/departments")}
-                >
-                  <Text>Manage Departments</Text>
-                  <Icon name="building" size={20} color="#FEA13D" />
-                </TouchableOpacity>
+                {user?.role !== "admin" ? null : (
+                  <TouchableOpacity
+                    className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
+                    onPress={() => router.push("/users")}
+                  >
+                    <Text>Manage Users</Text>
+                    <Icon name="users" size={20} color="#FEA13D" />
+                  </TouchableOpacity>
+                )}
+
+                {/* Manage Departments */}
+                {user?.role !== "admin" ? null : (
+                  <TouchableOpacity
+                    className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
+                    onPress={() => router.push("/departments")}
+                  >
+                    <Text>Manage Departments</Text>
+                    <Icon name="building" size={20} color="#FEA13D" />
+                  </TouchableOpacity>
+                )}
               </View>
             )}
             keyExtractor={(item) => item.key}

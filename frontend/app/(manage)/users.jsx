@@ -13,7 +13,13 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { deleteUser, getUsers, signUpUser, updateUser } from "../../lib/db";
+import {
+  deleteUser,
+  getUsers,
+  resetPassword,
+  signUpUser,
+  updateUser,
+} from "../../lib/db";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import useRefresh from "../../lib/useRefresh";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -70,6 +76,12 @@ const Users = () => {
     role: "user",
   });
   const [editUser, setEditUser] = useState([]);
+  const [showResetPass, setShowResetPass] = useState(false);
+  const [resetPass, setResetPass] = useState({
+    userId: "",
+    newPassword: "",
+  });
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const toggleEvent = (index) => {
     setOpenEventIndex(openEventIndex === index ? null : index);
@@ -237,6 +249,60 @@ const Users = () => {
     }
   };
 
+  const handleShowReset = (id) => {
+    setShowResetPass(true);
+    setResetPass({ ...resetPass, userId: id });
+  };
+
+  const resetPasswordBtn = () => {
+    if (resetPass.newPassword === "" || confirmNewPassword === "") {
+      return Alert.alert("Error", "Please fill in all the fields");
+    }
+
+    if (resetPass.newPassword === confirmNewPassword) {
+      Alert.alert(
+        "Reset Password",
+        "Are you sure do you want to reset user password?",
+        [
+          {
+            text: "Cancel",
+            // onPress: () => Alert.alert('Cancel Pressed'),
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: () => resetUserPassWord(),
+          },
+        ]
+      );
+    } else {
+      Alert.alert("Error", "Passwords do not match!");
+    }
+  };
+
+  const resetUserPassWord = async () => {
+    setIsUserLoading(true);
+    try {
+      const res = await resetPassword(resetPass, accessToken);
+
+      if (res.data) {
+        await refetch();
+
+        Alert.alert("Success", "You successfully reset user password!"),
+          setShowResetPass(false);
+        setResetPass({
+          userId: "",
+          newPassword: "",
+        });
+        setConfirmNewPassword("");
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setIsUserLoading(false);
+    }
+  };
+
   return (
     <>
       <SafeAreaView className="bg-primary h-full">
@@ -321,6 +387,12 @@ const Users = () => {
                         <Text>Department: {user.department}</Text>
                         <Text>Year: {user.year}</Text>
                         <Text>Role: {user.role}</Text>
+                        <Text
+                          className="text-secondary underline"
+                          onPress={() => handleShowReset(user._id)}
+                        >
+                          Reset Password
+                        </Text>
                       </View>
                     )}
                   </View>
@@ -584,6 +656,60 @@ const Users = () => {
             <CustomButton
               title="Cancel"
               handlePress={() => setShowDeleteUser(false)}
+              containerStyles="mt-5"
+            />
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* Reset Password */}
+      <Modal
+        animationType="slide" // or 'fade' for a fade effect
+        transparent={true} // Makes the modal background transparent
+        visible={showResetPass}
+        onRequestClose={() => setShowResetPass(false)}
+      >
+        <SafeAreaView className="bg-primary h-full">
+          <View className="w-full justify-center px-4 my-10">
+            <Text className="text-2xl text-secondary-200 font-psemibold">
+              Reset Password
+            </Text>
+
+            <FormField
+              title="New Password"
+              value={resetPass.newPassword}
+              placeholder="Enter your new Password"
+              handleChangeText={(e) =>
+                setResetPass({ ...resetPass, newPassword: e })
+              }
+              otherStyles="mt-5"
+              secureTextEntry
+            />
+
+            <FormField
+              title="Confirm Password"
+              value={confirmNewPassword}
+              placeholder="Confirm your Password"
+              handleChangeText={(e) => setConfirmNewPassword(e)}
+              otherStyles="mt-5"
+              secureTextEntry
+            />
+
+            <CustomButton
+              title="Reset"
+              handlePress={resetPasswordBtn}
+              containerStyles="mt-5"
+            />
+            <CustomButton
+              title="Cancel"
+              handlePress={() => {
+                setShowResetPass(false);
+                setResetPass({
+                  userId: "",
+                  newPassword: "",
+                });
+                setConfirmNewPassword("");
+              }}
               containerStyles="mt-5"
             />
           </View>

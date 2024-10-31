@@ -7,7 +7,39 @@ const getAllUsers = async (req, res) => {
       .select("-createdAt -password")
       .lean();
 
+    if (!users) {
+      return res.status(404).json({
+        status: false,
+        data: [],
+        error: "Users not found!",
+      });
+    }
+
     return res.status(200).json({ status: true, data: users, errors: [] });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      data: [],
+      errors: [{ message: error.message }],
+    });
+  }
+};
+
+const getUserById = async (req, res) => {
+  try {
+    let user = await User.findOne({ _id: req.user._id, isActive: true })
+      .select("-createdAt -password")
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        data: [],
+        error: "User not found.",
+      });
+    }
+
+    return res.status(200).json({ status: true, data: user, errors: [] });
   } catch (error) {
     return res.status(500).json({
       status: false,
@@ -99,6 +131,7 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
   getAllUsers,
+  getUserById,
   updateUser,
   deleteUser,
 };

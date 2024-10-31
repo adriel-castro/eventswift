@@ -4,12 +4,15 @@ const { check } = require("express-validator");
 
 const {
   getAllUsers,
+  getUserById,
   updateUser,
   deleteUser,
 } = require("../controllers/userController");
 const { auth } = require("../middlewares/auth.middleware");
 
 router.get("/", [auth], getAllUsers);
+
+router.get("/:id", [auth], getUserById);
 
 router.put(
   "/:id",
