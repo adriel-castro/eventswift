@@ -222,11 +222,7 @@ const getMe = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    let user = await User.findById(decoded.user.id);
+    let user = await User.findById({ _id: req.body.userId });
 
     if (!user) {
       return res.status(404).json({

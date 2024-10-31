@@ -42,6 +42,7 @@ router.post(
 router.post(
   "/reset",
   [
+    check("userId", "User Id is required").notEmpty(),
     check(
       "newPassword",
       "New Password is required and should be greater than or equals to 8 characters, composed of upper case, lower case, numbers and special characters."
