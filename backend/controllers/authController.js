@@ -220,6 +220,42 @@ const getMe = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let user = await User.findById(decoded.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        data: [],
+        errors: [
+          {
+            message: "User not found!",
+          },
+        ],
+      });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ status: true, data: user, error: [] });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      data: [],
+      error: { message: error.message },
+    });
+  }
+};
+
 const generateToken = (id, pass) => {
   return jwt.sign({ user: { id, password: pass } }, process.env.JWT_SECRET, {
     expiresIn: "10d",
@@ -230,4 +266,5 @@ module.exports = {
   signup,
   getMe,
   login,
+  resetPassword,
 };

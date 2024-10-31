@@ -2,7 +2,12 @@ const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
 
-const { signup, getMe, login } = require("../controllers/authController");
+const {
+  signup,
+  getMe,
+  login,
+  resetPassword,
+} = require("../controllers/authController");
 const { auth } = require("../middlewares/auth.middleware");
 
 router.post(
@@ -32,6 +37,20 @@ router.post(
     check("password", "Password is required").notEmpty(),
   ],
   login
+);
+
+router.post(
+  "/reset",
+  [
+    check(
+      "newPassword",
+      "New Password is required and should be greater than or equals to 8 characters, composed of upper case, lower case, numbers and special characters."
+    )
+      .matches(/^[a-zA-Z0-9!@#$%^&*()_+{}\[\]:;<>,.?~\/\\-]*$/, "i")
+      .isLength(8),
+    auth,
+  ],
+  resetPassword
 );
 
 router.get("/me", [auth], getMe);
