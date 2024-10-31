@@ -17,6 +17,12 @@ const ManageLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="reports"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
 
       <StatusBar backgroundColor="#016738" style="light" />

@@ -11,10 +11,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  RefreshControl,
 } from "react-native";
 
 import { icons } from "../../constants";
 import {
+  getCurrentUser,
   getEvents,
   getUserAccount,
   updateUser,
@@ -34,6 +36,7 @@ import Loader from "../../components/reusables/Loader";
 const Account = () => {
   const {
     user,
+    setUser,
     isLoading,
     setIsLoading,
     logout,
@@ -117,6 +120,10 @@ const Account = () => {
     try {
       const res = await updateUser(accountData._id, accountUpdate, accessToken);
 
+      // const result = await getCurrentUser(accessToken);
+      // // console.log("ressssss", result.data);
+      // setUser(result.data);
+
       if (res.data) {
         refetchUser();
 
@@ -137,81 +144,89 @@ const Account = () => {
         <Loader />
       ) : (
         <SafeAreaView className="bg-primary h-full">
-          <ScrollView
+          <FlatList
+            data={[{ key: "account" }]}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefreshUser}
               />
             }
-          >
-            <FlatList
-              data={[{ key: "account" }]}
-              ListHeaderComponent={() => (
-                <View className="w-full flex mt-6 mb-12 px-4">
-                  <View className="flex flex-row justify-end gap-4">
-                    {/* <TouchableOpacity
+            ListHeaderComponent={() => (
+              <View className="w-full flex mt-6 mb-12 px-4">
+                <View className="flex flex-row justify-end gap-4">
+                  {/* <TouchableOpacity
                     onPress={() => handleShowEditModal(user ? user : null)}
                   >
                     <Icon name="user-edit" size={20} color="#FEA13D" />
                   </TouchableOpacity> */}
-                    <TouchableOpacity onPress={logout}>
-                      <Image
-                        source={icons.logout}
-                        resizeMode="contain"
-                        className="w-6 h-6"
-                      />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View className="w-full flex items-center justify-center mt-6">
-                    <View className="w-16 h-16 border border-secondary rounded-lg flex items-center justify-center">
-                      <Image
-                        source={{
-                          uri:
-                            user?.avatar ||
-                            "https://png.pngtree.com/png-clipart/20200224/original/pngtree-cartoon-color-simple-male-avatar-png-image_5230557.jpg",
-                        }}
-                        className="w-[90%] h-[90%] rounded-lg"
-                        resizeMode="cover"
-                      />
-                    </View>
-                    <InfoBox
-                      title={
-                        user?.firstName.charAt(0).toUpperCase() +
-                        user?.firstName.slice(1) +
-                        " " +
-                        user?.lastName.charAt(0).toUpperCase() +
-                        user?.lastName.slice(1)
-                      }
-                      containerStyles="mt-5 text-center"
-                      titleStyles="text-lg"
+                  <TouchableOpacity onPress={logout}>
+                    <Image
+                      source={icons.logout}
+                      resizeMode="contain"
+                      className="w-6 h-6"
                     />
-                    <View className="mt-5 flex flex-row">
-                      <InfoBox
-                        title={eventsData.length || 0}
-                        subtitle="Events"
-                        titleStyles="text-xl"
-                        containerStyles="mr-10"
-                      />
-                      <InfoBox
-                        title={userAttendance.length || 0}
-                        subtitle="Attended"
-                        titleStyles="text-xl"
-                      />
-                    </View>
-                  </View>
-
-                  {/* Manage Account */}
-                  <TouchableOpacity
-                    className="flex flex-row mt-10 items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
-                    onPress={() => setShowEditAccount(true)}
-                  >
-                    <Text>Manage Account</Text>
-                    <Icon name="user-edit" size={20} color="#FEA13D" />
                   </TouchableOpacity>
+                </View>
 
-                  {/* Manage User */}
+                <View className="w-full flex items-center justify-center mt-6">
+                  <View className="w-16 h-16 border border-secondary rounded-lg flex items-center justify-center">
+                    <Image
+                      source={{
+                        uri:
+                          user?.avatar ||
+                          "https://png.pngtree.com/png-clipart/20200224/original/pngtree-cartoon-color-simple-male-avatar-png-image_5230557.jpg",
+                      }}
+                      className="w-[90%] h-[90%] rounded-lg"
+                      resizeMode="cover"
+                    />
+                  </View>
+                  <InfoBox
+                    title={
+                      user?.firstName.charAt(0).toUpperCase() +
+                      user?.firstName.slice(1) +
+                      " " +
+                      user?.lastName.charAt(0).toUpperCase() +
+                      user?.lastName.slice(1)
+                    }
+                    containerStyles="mt-5 text-center"
+                    titleStyles="text-lg"
+                  />
+                  <View className="mt-5 flex flex-row">
+                    <InfoBox
+                      title={eventsData.length || 0}
+                      subtitle="Events"
+                      titleStyles="text-xl"
+                      containerStyles="mr-10"
+                    />
+                    <InfoBox
+                      title={userAttendance.length || 0}
+                      subtitle="Attended"
+                      titleStyles="text-xl"
+                    />
+                  </View>
+                </View>
+
+                {/* Manage Account */}
+                <TouchableOpacity
+                  className="flex flex-row mt-10 items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
+                  onPress={() => setShowEditAccount(true)}
+                >
+                  <Text>Manage Account</Text>
+                  <Icon name="user-edit" size={20} color="#FEA13D" />
+                </TouchableOpacity>
+
+                {/* Manage Reports */}
+                <TouchableOpacity
+                  className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
+                  onPress={() => router.push("/reports")}
+                >
+                  <Text>Reports</Text>
+                  <Icon name="chart-line" size={20} color="#FEA13D" />
+                </TouchableOpacity>
+
+                {/* Manage User */}
+                {user?.role !== "admin" ? null : (
                   <TouchableOpacity
                     className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
                     onPress={() => router.push("/users")}
@@ -219,8 +234,10 @@ const Account = () => {
                     <Text>Manage Users</Text>
                     <Icon name="users" size={20} color="#FEA13D" />
                   </TouchableOpacity>
+                )}
 
-                  {/* Manage Departments */}
+                {/* Manage Departments */}
+                {user?.role !== "admin" ? null : (
                   <TouchableOpacity
                     className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
                     onPress={() => router.push("/departments")}
@@ -228,11 +245,11 @@ const Account = () => {
                     <Text>Manage Departments</Text>
                     <Icon name="building" size={20} color="#FEA13D" />
                   </TouchableOpacity>
-                </View>
-              )}
-              keyExtractor={(item) => item.key}
-            />
-          </ScrollView>
+                )}
+              </View>
+            )}
+            keyExtractor={(item) => item.key}
+          />
         </SafeAreaView>
       )}
 

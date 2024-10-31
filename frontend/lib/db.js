@@ -30,6 +30,20 @@ export const signUpUser = async (data) => {
   }
 };
 
+export const resetPassword = async (data, token) => {
+  try {
+    const res = await api.resetPass(data, token);
+    return res.data;
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.errors) {
+      const errorMessage = error.response.data.errors[0].message;
+      throw new Error(errorMessage);
+    } else {
+      throw new Error(error.message);
+    }
+  }
+};
+
 export const getCurrentUser = async (token) => {
   try {
     const user = await api.authMe(token);

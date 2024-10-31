@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  ScrollView,
   RefreshControl,
   TouchableOpacity,
   Modal,
@@ -10,7 +9,6 @@ import {
   FlatList,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import DataTable from "react-native-datatable-component";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import useRefresh from "../../lib/useRefresh";
@@ -20,7 +18,7 @@ import Loader from "../../components/reusables/Loader";
 import CustomButton from "../../components/CustomButton";
 
 const Attendance = () => {
-  const { accessToken } = useGlobalContext();
+  const { user, accessToken } = useGlobalContext();
   const { data: eventsData } = useRefresh(() => getEvents(accessToken));
   const [eventsAttendance, setEventsAttendance] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,9 +26,6 @@ const Attendance = () => {
   const [eventsFeedback, setEventsFeedback] = useState([]);
   const [showFeedback, setShowFeedback] = useState(false);
 
-  // console.log(eventsFeedback);
-
-  // Fetch attendance for each event and include the event title
   const fetchAttendanceData = async () => {
     if (!eventsData) return;
     setLoading(true);
@@ -44,12 +39,9 @@ const Attendance = () => {
           };
         })
       );
-
-      // Filter out empty attendance data
       const allData = attendanceData.filter(
         (item) => item.attendance.length > 0
       );
-
       setEventsAttendance(allData);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
@@ -68,14 +60,17 @@ const Attendance = () => {
     setRefreshing(false);
   };
 
-  const colNames = ["id", "studentID", "fullName", "timestamps", "duration"];
-  const colSettings = [
-    { name: "id", sortable: true },
-    { name: "studentID", sortable: true },
-    { name: "fullName", sortable: true },
-    { name: "timestamps", sortable: true },
-    { name: "duration", sortable: true },
-  ];
+  const dataTable = (attendance) =>
+    attendance.map((item, index) => ({
+      id: index + 1,
+      studentID: item.attendee.studentID,
+      fullName: `${item.attendee.firstName} ${item.attendee.lastName}`,
+      timestamps: item.timestamps.length,
+      duration: `${totalDuration(
+        item.event.startTime,
+        item.event.endTime
+      )} hours`,
+    }));
 
   const fetchFeedback = async (id) => {
     setLoading(true);
@@ -95,145 +90,126 @@ const Attendance = () => {
     setShowFeedback(true);
   };
 
-  const dataTable = (attendance) => {
-    return attendance.map((item, index) => ({
-      id: index + 1,
-      studentID: item.attendee.studentID,
-      fullName: `${item.attendee.firstName} ${item.attendee.lastName}`,
-      timestamps: item.timestamps.length,
-      duration: `${totalDuration(
-        item.event.startTime,
-        item.event.endTime
-      )} hours`,
-    }));
-  };
-
-  const filteredFeedbackData = eventsFeedback.map((item, index) => ({
-    id: index + 1,
-    studentID: item.attendee.studentID,
-    fullName:
-      item.attendee.firstName.charAt(0).toUpperCase() +
-      item.attendee.firstName.slice(1) +
-      " " +
-      item.attendee.lastName.charAt(0).toUpperCase() +
-      item.attendee.lastName.slice(1),
-    rating: item.feedback.rating,
-    comment: item.feedback.comment,
-  }));
-
   const totalDuration = (startTime, endTime) => {
     const start = moment(startTime, "h:mm A");
     const end = moment(endTime, "h:mm A");
     return end.diff(start, "hours", true);
   };
 
+  const renderAttendanceItem = ({ item }) => (
+    <View className="flex-row border border-gray-300 py-2" key={item.id}>
+      <Text className="flex-1 text-center">{item.id}</Text>
+      <Text className="flex-1 text-center">{item.studentID}</Text>
+      <Text className="flex-1 text-center">{item.fullName}</Text>
+      <Text className="flex-1 text-center">{item.timestamps}</Text>
+      <Text className="flex-1 text-center">{item.duration}</Text>
+    </View>
+  );
+
+  const renderFeedbackItem = ({ item }) => (
+    <View className="flex-row border border-gray-300 py-2 px-2">
+      <Text className="flex-1 text-center">{item.attendee.studentID}</Text>
+      <Text className="flex-1 text-center">
+        {item.attendee.firstName} {item.attendee.lastName}
+      </Text>
+      <Text className="flex-1 text-center">{item.feedback.rating}</Text>
+      <Text className="flex-1 text-center">{item.feedback.comment}</Text>
+    </View>
+  );
+
   return (
     <>
-      <SafeAreaView className="bg-primary h-full">
-        <ScrollView
-          className="flex-1"
+      <SafeAreaView className="flex-1 bg-primary">
+        <FlatList
+          data={eventsAttendance}
+          keyExtractor={(item) => item.eventName._id}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-        >
-          <Text className="text-2xl px-4 mt-10 text-semibold text-secondary font-psemibold">
-            Attendance
-          </Text>
-          {loading ? (
-            <Loader />
-          ) : (
-            <>
-              {eventsAttendance.map((eventData, index) => (
-                <View key={index} className="mt-5 px-5">
-                  <Text className="text-lg text-psemibold text-secondary font-psemibold">
-                    {eventData.eventName.name}
+          ListHeaderComponent={
+            <View className="mt-10">
+              {/* <Text className="text-2xl text-secondary font-bold text-center">
+                Attendance
+              </Text> */}
+              <Text className="text-2xl px-4 text-semibold text-secondary font-psemibold">
+                Attendance
+              </Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <View className="mb-4 p-4 border border-gray-300 rounded">
+              <Text className="text-lg font-bold text-secondary mb-2">
+                {item.eventName.name}
+              </Text>
+              <View className="flex-row bg-[#F3F5AD] py-2">
+                <Text className="flex-1 text-center font-bold">ID</Text>
+                <Text className="flex-1 text-center font-bold">Student ID</Text>
+                <Text className="flex-1 text-center font-bold">Full Name</Text>
+                <Text className="flex-1 text-center font-bold">Timestamps</Text>
+                <Text className="flex-1 text-center font-bold">Duration</Text>
+              </View>
+              <FlatList
+                data={dataTable(item.attendance)}
+                renderItem={renderAttendanceItem}
+                keyExtractor={(item) => item.id}
+              />
+
+              {user?.role !== "admin" ? null : (
+                <TouchableOpacity
+                  onPress={() => openFeedbackModal(item.eventName._id)}
+                >
+                  <Text className="text-secondary text-right mt-2 font-bold">
+                    View Feedbacks {`>`}
                   </Text>
-                  <DataTable
-                    data={dataTable(eventData.attendance)}
-                    colNames={colNames}
-                    colSettings={colSettings}
-                    noOfPages={Math.ceil(eventData.attendance.length / 5)}
-                    backgroundColor="#f9f9f9"
-                    headerLabelStyle={{ color: "black", fontWeight: "bold" }}
-                    render={(data, idx) => (
-                      <View
-                        key={idx}
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <Text>{data.id}</Text>
-                        <Text>{data.studentID}</Text>
-                        <Text>{data.fullName}</Text>
-                        <Text>{data.timestamps}</Text>
-                        <Text>{data.duration}</Text>
-                      </View>
-                    )}
-                  />
-                  <View>
-                    <TouchableOpacity
-                      onPress={() => openFeedbackModal(eventData.eventName._id)}
-                    >
-                      <Text className="text-md mt-2 text-right text-psemibold text-secondary font-psemibold">
-                        View Feedbacks {`>`}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
-            </>
+                </TouchableOpacity>
+              )}
+            </View>
           )}
-        </ScrollView>
+        />
       </SafeAreaView>
 
-      {/* Feedback Modal */}
       <Modal
-        animationType="slide" // or 'fade' for a fade effect
-        transparent={true} // Makes the modal background transparent
+        animationType="slide"
+        transparent={true}
         visible={showFeedback}
         onRequestClose={() => setShowFeedback(false)}
       >
-        <SafeAreaView className="bg-primary h-full mb-10">
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-          >
-            <FlatList
-              data={[{ key: "feedback" }]}
-              renderItem={() => (
-                <View className="w-full justify-center px-4 mt-10 mb-10">
-                  <Text className="text-2xl text-secondary-200 font-psemibold">
-                    Feedbacks
-                  </Text>
-
-                  <DataTable
-                    data={filteredFeedbackData}
-                    colNames={[
-                      "id",
-                      "studentID",
-                      "fullName",
-                      "rating",
-                      "comment",
-                    ]}
-                    colSettings={[
-                      { name: "id", sortable: true },
-                      { name: "studentID", sortable: true },
-                      { name: "fullName", sortable: true },
-                      { name: "rating", sortable: true },
-                      { name: "comment", sortable: true },
-                    ]}
-                    noOfPages={Math.ceil(filteredFeedbackData.length / 10)}
-                    backgroundColor="#f9f9f9" // Background color for table
-                    headerLabelStyle={{ color: "black", fontWeight: "bold" }}
-                  />
-
-                  <CustomButton
-                    title="Close"
-                    handlePress={() => setShowFeedback(false)}
-                    containerStyles="mt-10"
-                  />
-                </View>
-              )}
-              keyExtractor={(item) => item.key}
-            />
-          </KeyboardAvoidingView>
+        <SafeAreaView className="bg-primary h-full">
+          <View className="w-full justify-center px-4">
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+              <View className="my-5">
+                <Text className="text-2xl px-4 text-semibold text-secondary font-psemibold">
+                  Feedback
+                </Text>
+              </View>
+              <FlatList
+                data={eventsFeedback}
+                renderItem={renderFeedbackItem}
+                keyExtractor={(item) => item._id} // Use the _id as the unique key
+                ListHeaderComponent={
+                  <View className="flex-row bg-[#F3F5AD] py-2">
+                    <Text className="flex-1 text-center font-bold">
+                      Student ID
+                    </Text>
+                    <Text className="flex-1 text-center font-bold">
+                      Full Name
+                    </Text>
+                    <Text className="flex-1 text-center font-bold">Rating</Text>
+                    <Text className="flex-1 text-center font-bold">
+                      Comment
+                    </Text>
+                  </View>
+                }
+              />
+              <CustomButton
+                title="Close"
+                handlePress={() => setShowFeedback(false)}
+                containerStyles="mt-5"
+              />
+            </KeyboardAvoidingView>
+          </View>
         </SafeAreaView>
       </Modal>
     </>

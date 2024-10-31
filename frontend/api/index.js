@@ -11,6 +11,14 @@ export const signup = (data) => {
   return axios.post(`${url}/auth/signup`, data);
 };
 
+export const resetPass = (newPass, accessToken) => {
+  return axios.post(`${url}/auth/reset`, newPass, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
 export const authMe = (accessToken) => {
   return axios.get(`${url}/auth/me`, {
     headers: {

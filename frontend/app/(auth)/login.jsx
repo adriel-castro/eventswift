@@ -29,13 +29,14 @@ const LogIn = () => {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (error) {
-      console.log("error getting token", error.message);
+      console.log("Error storing token:", error.message || "Unknown error");
     }
   };
 
   const submit = async () => {
     if (form.username === "" || form.password === "") {
       Alert.alert("Error", "Please fill in all the fields");
+      return;
     }
 
     setIsSubmitting(true);
@@ -44,7 +45,7 @@ const LogIn = () => {
       const token = data.data.accessToken;
       const result = await getCurrentUser(token);
 
-      storeData("access_token", token);
+      await storeData("access_token", token);
 
       setUser(result.data);
       setIsLoggedIn(true);
@@ -52,8 +53,8 @@ const LogIn = () => {
       Alert.alert("Success", "User signed in successfully!");
       router.replace("/home");
     } catch (error) {
-      console.log("error login", error);
-      Alert.alert("Error", error.message);
+      console.log("Login error:", error);
+      Alert.alert("Error", error.message || "An error occurred during login.");
       setUser(null);
       setIsLoggedIn(false);
     } finally {
@@ -75,11 +76,11 @@ const LogIn = () => {
             />
 
             {networkStatus === null ? (
-              <Text className="mt-5 text-xl text-red-500 text-semibold font-psemibold">
-                You can't Login, please connect to the University WiFi.
+              <Text className="mt-5 text-xl text-red-500 font-psemibold">
+                You can't log in, please connect to the University WiFi.
               </Text>
             ) : (
-              <Text className="text-2xl text-secondary text-semibold mt-5 font-psemibold">
+              <Text className="text-2xl text-secondary font-psemibold mt-5">
                 Log in to Eventswift
               </Text>
             )}
@@ -100,25 +101,24 @@ const LogIn = () => {
 
             <CustomButton
               title="Log in"
-              handlePress={submit}
+              handlePress={networkStatus === null ? null : submit}
               containerStyles="mt-7"
-              // isLoading={isSubmitting}
-              isLoading={networkStatus === null ? true : isSubmitting}
+              isLoading={isSubmitting}
             />
 
-            {networkStatus !== null ? (
-            <View className="justify-center pt-5 flex-row gap-2">
-              <Text className="text-lg text-gray-100 font-pregular">
-                Don't have account?
-              </Text>
-              <Link
-                href="/signup"
-                className="text-lg font-psemibold text-secondary"
-              >
-                Sign Up
-              </Link>
-            </View>
-            ) : null}
+            {networkStatus !== null && (
+              <View className="justify-center pt-5 flex-row gap-2">
+                <Text className="text-lg text-gray-100 font-pregular">
+                  Don't have an account?
+                </Text>
+                <Link
+                  href="/signup"
+                  className="text-lg font-psemibold text-secondary"
+                >
+                  Sign Up
+                </Link>
+              </View>
+            )}
           </View>
         </ScrollView>
       )}

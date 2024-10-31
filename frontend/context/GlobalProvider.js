@@ -19,7 +19,7 @@ const GlobalProvider = ({ children }) => {
   // custom Hooks
   const { networkStatus, handleLogout } = useNetworkChecker();
   const { ongoingEvent } = useTimestamps(accessToken, networkStatus);
-  const { departments } = useDepartments(networkStatus);
+  const { departments } = useDepartments(networkStatus, accessToken);
 
   const signalLevel = networkStatus
     ? networkStatus.signal_level
@@ -88,7 +88,7 @@ const GlobalProvider = ({ children }) => {
     };
 
     fetchUserData();
-  }, [accessToken]);
+  }, [isLoading, accessToken]);
 
   return (
     <GlobalContext.Provider
