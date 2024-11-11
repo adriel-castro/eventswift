@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getDepartments } from "./db";
 
-const useDepartments = (networkStatus, accessToken) => {
+const useDepartments = (networkStatus) => {
   const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const useDepartments = (networkStatus, accessToken) => {
     };
 
     getAllDepartment();
-  }, [networkStatus, accessToken]);
+  }, [networkStatus]);
 
   return { departments };
 };

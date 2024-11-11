@@ -163,6 +163,15 @@ export const deleteDepartment = async (id, token) => {
   }
 };
 
+export const getDepartmentEvents = async (userId, token) => {
+  try {
+    const event = await api.getAllEventInDepartment(userId, token);
+    return event.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
 export const getEvents = async (token) => {
   try {
     const event = await api.getAllEvents(token);
@@ -274,6 +283,15 @@ export const createFeedback = async (eventId, token, data) => {
 export const getEventsFeedback = async (eventId, token) => {
   try {
     const res = await api.getFeedback(eventId, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
+export const getAllFeedback = async (token) => {
+  try {
+    const res = await api.getAllEventsFeedback(token);
     return res.data;
   } catch (error) {
     errorHelper(error);

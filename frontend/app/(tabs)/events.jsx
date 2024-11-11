@@ -14,7 +14,7 @@ import {
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGlobalContext } from "../../context/GlobalProvider";
-import { createNewEvent, getEvents } from "../../lib/db";
+import { createNewEvent, getDepartmentEvents, getEvents } from "../../lib/db";
 import useRefresh from "../../lib/useRefresh";
 import Loader from "../../components/reusables/Loader";
 import AccordionItem from "../../components/AccordionItem";
@@ -27,7 +27,7 @@ import CustomButton from "../../components/CustomButton";
 import moment from "moment";
 
 const Events = () => {
-  const { accessToken, departments: deptData } = useGlobalContext();
+  const { user, accessToken, departments: deptData } = useGlobalContext();
   const [refreshing, setRefreshing] = useState(false);
   const {
     data: eventsData,
@@ -35,6 +35,11 @@ const Events = () => {
     loading,
     refetch,
   } = useRefresh(() => getEvents(accessToken));
+  const {
+    data: departmentEventsData,
+    loading: eventDeptLoader,
+    refetch: refetchEventDept,
+  } = useRefresh(() => getDepartmentEvents(user?._id, accessToken));
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const [eventLoader, setEventLoader] = useState(false);
@@ -70,6 +75,7 @@ const Events = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     await refetch();
+    await refetchEventDept();
     setRefreshing(false);
   };
 
@@ -170,7 +176,7 @@ const Events = () => {
   return (
     <>
       <SafeAreaView className="bg-primary h-full">
-        {loading && eventLoader ? (
+        {loading && eventDeptLoader && eventLoader ? (
           <Loader />
         ) : (
           <ScrollView
@@ -194,9 +200,19 @@ const Events = () => {
                 />
               </TouchableOpacity>
             </View>
-            {eventsData && eventsData.length <= 0 ? null : (
+            {user?.role === "admin" ? (
+              eventsData && eventsData.length <= 0 ? null : (
+                <View className="p-4">
+                  <AccordionItem eventsData={eventsData} refetch={refetch} />
+                </View>
+              )
+            ) : departmentEventsData &&
+              departmentEventsData.length <= 0 ? null : (
               <View className="p-4">
-                <AccordionItem eventsData={eventsData} refetch={refetch} />
+                <AccordionItem
+                  eventsData={departmentEventsData}
+                  refetch={refetchEventDept}
+                />
               </View>
             )}
           </ScrollView>

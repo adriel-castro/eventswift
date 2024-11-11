@@ -287,7 +287,13 @@ const EventAccordion = ({ event, isOpen, onToggle, refetch }) => {
                 />
               ) : null}
 
-              {user?.role === "admin" || ongoingEvent !== null ? null : (
+              {user?.role === "admin" ||
+              ongoingEvent !== null ||
+              getEventStatus(
+                event.eventDate,
+                event.startTime,
+                event.endTime
+              ) === "Finished" ? null : (
                 <CustomButton
                   title="Join Event"
                   handlePress={() => router.push("/join")}
@@ -295,11 +301,11 @@ const EventAccordion = ({ event, isOpen, onToggle, refetch }) => {
                 />
               )}
 
-              {getEventStatus(
-                event.eventDate,
-                event.startTime,
-                event.endTime
-              ) === "Finished" ? (
+              {user?.role === "admin" ? null : getEventStatus(
+                  event.eventDate,
+                  event.startTime,
+                  event.endTime
+                ) === "Finished" ? (
                 <CustomButton
                   title="Feedback"
                   handlePress={() =>

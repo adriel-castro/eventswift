@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { connectionStatus, signOut } from "./db";
 import { router } from "expo-router";
 
-const useNetworkChecker = () => {
+const useNetworkChecker = (setUser, setIsLoggedIn) => {
   const [networkStatus, setNetworkStatus] = useState(null);
   const [isNetworkLoading, setIsNetworkLoading] = useState(false);
   let intervalId;
@@ -22,9 +22,11 @@ const useNetworkChecker = () => {
           Alert.alert("Warning", "No Wi-Fi data received.");
         }
       } catch (error) {
-        Alert.alert("Error", error.message);
-        router.replace("/login");
-        clearInterval(intervalId);
+        Alert.alert("Error1", error.message);
+        await signOut();
+        setUser(null);
+        setIsLoggedIn(false);
+        handleLogout();
       } finally {
         setIsNetworkLoading(false);
       }

@@ -3,9 +3,12 @@ const router = express.Router();
 const { check } = require("express-validator");
 const { auth } = require("../middlewares/auth.middleware");
 const {
+  getAllEventFeedback,
   getEventFeedback,
   createFeedback,
 } = require("../controllers/feedbackController");
+
+router.get("/", [auth], getAllEventFeedback);
 
 router.get("/:eventId", [auth], getEventFeedback);
 
