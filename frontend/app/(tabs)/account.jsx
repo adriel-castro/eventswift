@@ -217,13 +217,15 @@ const Account = () => {
                 </TouchableOpacity>
 
                 {/* Manage Reports */}
-                <TouchableOpacity
-                  className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
-                  onPress={() => router.push("/reports")}
-                >
-                  <Text>Reports</Text>
-                  <Icon name="chart-line" size={20} color="#FEA13D" />
-                </TouchableOpacity>
+                {user?.role !== "admin" ? null : (
+                  <TouchableOpacity
+                    className="flex flex-row items-center justify-between w-full p-5 border border-gray-200 rounded-xl"
+                    onPress={() => router.push("/reports")}
+                  >
+                    <Text>Reports</Text>
+                    <Icon name="chart-line" size={20} color="#FEA13D" />
+                  </TouchableOpacity>
+                )}
 
                 {/* Manage User */}
                 {user?.role !== "admin" ? null : (

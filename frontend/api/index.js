@@ -87,6 +87,14 @@ export const removeDepartment = (id, accessToken) => {
   });
 };
 
+export const getAllEventInDepartment = (userId, accessToken) => {
+  return axios.get(`${url}/events/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
 export const getAllEvents = (accessToken) => {
   return axios.get(`${url}/events`, {
     headers: {
@@ -189,6 +197,14 @@ export const addEventFeedback = (eventId, accessToken, data) => {
 
 export const getFeedback = (eventId, accessToken) => {
   return axios.get(`${url}/feedback/${eventId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const getAllEventsFeedback = (accessToken) => {
+  return axios.get(`${url}/feedback/`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

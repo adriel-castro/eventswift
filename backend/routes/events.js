@@ -3,12 +3,15 @@ const router = express.Router();
 const { check } = require("express-validator");
 
 const {
+  getAllEventsByDepartment,
   getAllEvents,
   addEvent,
   updateEvent,
   deleteEvent,
 } = require("../controllers/eventController");
 const { auth } = require("../middlewares/auth.middleware");
+
+router.get("/:userId", [auth], getAllEventsByDepartment);
 
 router.get("/", [auth], getAllEvents);
 

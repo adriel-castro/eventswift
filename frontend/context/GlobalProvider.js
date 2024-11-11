@@ -17,9 +17,12 @@ const GlobalProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState("");
 
   // custom Hooks
-  const { networkStatus, handleLogout } = useNetworkChecker();
+  const { networkStatus, handleLogout } = useNetworkChecker(
+    setUser,
+    setIsLoggedIn
+  );
   const { ongoingEvent } = useTimestamps(accessToken, networkStatus);
-  const { departments } = useDepartments(networkStatus, accessToken);
+  const { departments } = useDepartments(networkStatus);
 
   const signalLevel = networkStatus
     ? networkStatus.signal_level

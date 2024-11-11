@@ -175,7 +175,10 @@ const TabsLayout = () => {
       </Tabs>
 
       {/* <StatusBar backgroundColor="#016738" style="light" /> */}
-      <StatusBar backgroundColor="#016738" style="light" />
+      <StatusBar
+        backgroundColor="#016738"
+        style={Platform.OS === "ios" ? "" : "light"}
+      />
     </>
   );
 };

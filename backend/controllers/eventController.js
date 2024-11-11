@@ -3,6 +3,44 @@ const Event = require("../models/Events");
 const User = require("../models/Users");
 const moment = require("moment");
 
+const getAllEventsByDepartment = async (req, res) => {
+  try {
+    let user = await User.findById({
+      _id: req.params.userId,
+    })
+      .select("-password")
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        data: [],
+        error: "User not found.",
+      });
+    }
+
+    let event = await Event.find({
+      department: user.department,
+    });
+
+    if (!event) {
+      return res.status(404).json({
+        status: false,
+        data: [],
+        error: "Event not found.",
+      });
+    }
+
+    return res.status(200).json({ status: true, data: event, errors: [] });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      data: [],
+      errors: [{ message: error.message }],
+    });
+  }
+};
+
 const getAllEvents = async (req, res) => {
   try {
     let event = await Event.find();
@@ -213,6 +251,7 @@ const deleteEvent = async (req, res) => {
 };
 
 module.exports = {
+  getAllEventsByDepartment,
   getAllEvents,
   addEvent,
   updateEvent,

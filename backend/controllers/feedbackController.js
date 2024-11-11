@@ -3,6 +3,28 @@ const Event = require("../models/Events");
 const Feedback = require("../models/Feedback");
 const Attendance = require("../models/Attendance");
 
+const getAllEventFeedback = async (req, res) => {
+  try {
+    let feedback = await Feedback.find();
+
+    if (!feedback) {
+      return res.status(404).json({
+        status: false,
+        data: [],
+        error: "Feedback not found.",
+      });
+    }
+
+    return res.status(200).json({ status: true, data: feedback, errors: [] });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      data: [],
+      errors: [{ message: error.message }],
+    });
+  }
+};
+
 const getEventFeedback = async (req, res) => {
   try {
     const eventId = req.params.eventId;
@@ -99,4 +121,4 @@ const createFeedback = async (req, res) => {
   }
 };
 
-module.exports = { getEventFeedback, createFeedback };
+module.exports = { getAllEventFeedback, getEventFeedback, createFeedback };
