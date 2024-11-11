@@ -13,18 +13,25 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import useRefresh from "../../lib/useRefresh";
-import { eventAttendances, getEvents, getEventsFeedback } from "../../lib/db";
+import {
+  eventAttendances,
+  getDepartmentEvents,
+  getEvents,
+  getEventsFeedback,
+} from "../../lib/db";
 import moment from "moment";
 import CustomButton from "../../components/CustomButton";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import jsPDF from "jspdf";
 import Loader from "../../components/reusables/Loader";
-// import * as XLSX from "xlsx";
 
 const Attendance = () => {
   const { user, accessToken } = useGlobalContext();
   const { data: eventsData } = useRefresh(() => getEvents(accessToken));
+  const { data: departmentEventsData } = useRefresh(() =>
+    getDepartmentEvents(user?._id, accessToken)
+  );
   const [eventsAttendance, setEventsAttendance] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -33,11 +40,14 @@ const Attendance = () => {
   const userId = user?._id;
 
   const fetchAttendanceData = async () => {
-    if (!eventsData) return;
+    const dataEvent =
+      user?.role !== "admin" ? departmentEventsData : eventsData;
+
+    if (!dataEvent) return;
     setLoading(true);
     try {
       const attendanceData = await Promise.all(
-        eventsData.map(async (event) => {
+        dataEvent.map(async (event) => {
           const attendance = await eventAttendances(event._id, accessToken);
           return {
             eventName: { _id: event._id, name: event.name },
@@ -77,7 +87,7 @@ const Attendance = () => {
 
   useEffect(() => {
     fetchAttendanceData();
-  }, [eventsData]);
+  }, [eventsData, departmentEventsData]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -365,55 +375,64 @@ const Attendance = () => {
   return (
     <>
       <SafeAreaView className="flex-1 bg-primary">
-        <FlatList
-          data={eventsAttendance}
-          keyExtractor={(item) => item.eventName._id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ListHeaderComponent={
-            <View className="mt-10">
-              {/* <Text className="text-2xl text-secondary font-bold text-center">
+        {loading ? (
+          <Loader />
+        ) : (
+          <FlatList
+            data={eventsAttendance}
+            keyExtractor={(item) => item.eventName._id}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            ListHeaderComponent={
+              <View className="mt-10">
+                {/* <Text className="text-2xl text-secondary font-bold text-center">
                 Attendance
               </Text> */}
-              <Text className="text-2xl px-4 text-semibold text-secondary font-psemibold">
-                Attendance
-              </Text>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <View className="mb-4 p-4 border border-gray-300 rounded">
-              <View className="flex flex-row justify-between items-center mb-2">
-                <Text className="text-lg font-bold text-secondary mb-2">
-                  {item.eventName.name}
+                <Text className="text-2xl px-4 text-semibold text-secondary font-psemibold">
+                  Attendance
                 </Text>
-                {user?.role !== "admin" ? null : (
-                  <TouchableOpacity
-                    onPress={() =>
-                      exportAttendanceData(
-                        dataTable(item.attendance),
-                        item.eventName.name
-                      )
-                    }
-                  >
-                    <Icon name="file-export" size={18} color="#FEA13D" />
-                  </TouchableOpacity>
-                )}
               </View>
-              <View className="flex-row bg-[#F3F5AD] py-2">
-                <Text className="flex-1 text-center font-bold">ID</Text>
-                <Text className="flex-1 text-center font-bold">Student ID</Text>
-                <Text className="flex-1 text-center font-bold">Full Name</Text>
-                <Text className="flex-1 text-center font-bold">Timestamps</Text>
-                <Text className="flex-1 text-center font-bold">Duration</Text>
-              </View>
-              <FlatList
-                data={dataTable(item.attendance)}
-                renderItem={renderAttendanceItem}
-                keyExtractor={(item) => item.id}
-              />
+            }
+            renderItem={({ item }) => (
+              <View className="mb-4 p-4 border border-gray-300 rounded">
+                <View className="flex flex-row justify-between items-center mb-2">
+                  <Text className="text-lg font-bold text-secondary mb-2">
+                    {item.eventName.name}
+                  </Text>
+                  {user?.role !== "admin" ? null : (
+                    <TouchableOpacity
+                      onPress={() =>
+                        exportAttendanceData(
+                          dataTable(item.attendance),
+                          item.eventName.name
+                        )
+                      }
+                    >
+                      <Icon name="file-export" size={18} color="#FEA13D" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <View className="flex-row bg-[#F3F5AD] py-2">
+                  <Text className="flex-1 text-center font-bold">ID</Text>
+                  <Text className="flex-1 text-center font-bold">
+                    Student ID
+                  </Text>
+                  <Text className="flex-1 text-center font-bold">
+                    Full Name
+                  </Text>
+                  <Text className="flex-1 text-center font-bold">
+                    Timestamps
+                  </Text>
+                  <Text className="flex-1 text-center font-bold">Duration</Text>
+                </View>
+                <FlatList
+                  data={dataTable(item.attendance)}
+                  renderItem={renderAttendanceItem}
+                  keyExtractor={(item) => item.id}
+                />
 
-              {user?.role !== "admin" ? null : (
+                {/* {user?.role !== "admin" ? null : ( */}
                 <TouchableOpacity
                   onPress={() => openFeedbackModal(item.eventName._id)}
                 >
@@ -421,10 +440,11 @@ const Attendance = () => {
                     View Feedbacks {`>`}
                   </Text>
                 </TouchableOpacity>
-              )}
-            </View>
-          )}
-        />
+                {/* )} */}
+              </View>
+            )}
+          />
+        )}
       </SafeAreaView>
 
       <Modal
