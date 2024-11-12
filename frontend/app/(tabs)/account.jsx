@@ -17,6 +17,7 @@ import {
 import { icons } from "../../constants";
 import {
   getCurrentUser,
+  getDepartmentEvents,
   getEvents,
   getUserAccount,
   updateUser,
@@ -44,6 +45,9 @@ const Account = () => {
     departments: deptItems,
   } = useGlobalContext();
   const { data: eventsData } = useRefresh(() => getEvents(accessToken));
+  const { data: departmentEventsData } = useRefresh(() =>
+    getDepartmentEvents(user?._id, accessToken)
+  );
   const { data: userAttendance } = useRefresh(() =>
     usersAttendance(accessToken)
   );
@@ -192,18 +196,23 @@ const Account = () => {
                     containerStyles="mt-5 text-center"
                     titleStyles="text-lg"
                   />
+
                   <View className="mt-5 flex flex-row">
                     <InfoBox
-                      title={eventsData.length || 0}
+                      title={
+                        user?.role !== "admin"
+                          ? departmentEventsData.length
+                          : eventsData.length || 0
+                      }
                       subtitle="Events"
                       titleStyles="text-xl"
-                      containerStyles="mr-10"
+                      // containerStyles="mr-10"
                     />
-                    <InfoBox
+                    {/* <InfoBox
                       title={userAttendance.length || 0}
                       subtitle="Attended"
                       titleStyles="text-xl"
-                    />
+                    /> */}
                   </View>
                 </View>
 
