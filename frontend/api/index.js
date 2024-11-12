@@ -27,6 +27,15 @@ export const authMe = (accessToken) => {
   });
 };
 
+export const uploadUsers = (formData, accessToken) => {
+  return axios.post(`${url}/users/import`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
 export const getAllUsers = (accessToken) => {
   return axios.get(`${url}/users`, {
     headers: {

@@ -1,14 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
+const multer = require("multer");
 
 const {
   getAllUsers,
   getUserById,
   updateUser,
   deleteUser,
+  importUsers,
 } = require("../controllers/userController");
 const { auth } = require("../middlewares/auth.middleware");
+
+// Multer setup for file uploads
+const upload = multer({ dest: "uploads/" });
 
 router.get("/", [auth], getAllUsers);
 
@@ -29,5 +34,7 @@ router.put(
 );
 
 router.delete("/:id", [auth], deleteUser);
+
+router.post("/import", [auth, upload.single("file")], importUsers);
 
 module.exports = router;

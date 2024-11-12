@@ -1,5 +1,10 @@
 const { validationResult } = require("express-validator");
 const User = require("../models/Users");
+const Department = require("../models/Departments");
+const Role = require("../models/Roles");
+const bcrypt = require("bcryptjs");
+const fs = require("fs");
+const csv = require("csv-parser");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -129,9 +134,119 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const importUsers = async (req, res) => {
+  try {
+    const errors = [];
+    const importedUsers = [];
+
+    const defaultPassword = "TempPassword!"; // Default password
+
+    // Open and read the CSV file
+    const fileRows = [];
+    fs.createReadStream(req.file.path)
+      .pipe(csv())
+      .on("data", (row) => fileRows.push(row))
+      .on("end", async () => {
+        for (const userData of fileRows) {
+          const {
+            email,
+            studentID,
+            firstName,
+            lastName,
+            birthDate,
+            address,
+            department,
+            year,
+            role,
+          } = userData;
+
+          // Validate required fields
+          if (
+            !email ||
+            !studentID ||
+            !firstName ||
+            !lastName ||
+            !department ||
+            !year
+          ) {
+            errors.push({ email, error: "Missing required fields." });
+            continue;
+          }
+
+          // Check for duplicate email or studentID
+          const existingEmail = await User.findOne({
+            email: email.toLowerCase(),
+          });
+          const existingStudentID = await User.findOne({ studentID });
+
+          if (existingEmail || existingStudentID) {
+            errors.push({ email, error: "Duplicate email or studentID." });
+            continue;
+          }
+
+          // Check if department exists
+          const findDepartment = await Department.findOne({
+            name: department.toUpperCase(),
+          });
+          if (!findDepartment) {
+            errors.push({ email, error: "Department does not exist." });
+            continue;
+          }
+
+          // Optional: Check if role exists
+          if (role) {
+            const findRole = await Role.findOne({ name: role.toLowerCase() });
+            if (!findRole) {
+              errors.push({ email, error: "Role does not exist." });
+              continue;
+            }
+          }
+
+          // Hash default password
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(defaultPassword, salt);
+
+          // Create new user with default password
+          const newUser = new User({
+            email: email.toLowerCase(),
+            studentID,
+            password: hashedPassword,
+            firstName,
+            lastName,
+            birthDate,
+            address,
+            department,
+            year,
+            role: role || "user",
+          });
+
+          await newUser.save();
+          importedUsers.push(newUser);
+        }
+
+        // Delete the CSV file after processing
+        fs.unlinkSync(req.file.path);
+
+        // Return results
+        res.status(201).json({
+          status: true,
+          data: importedUsers,
+          errors,
+        });
+      });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      data: [],
+      errors: [{ message: error.message }],
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
   updateUser,
   deleteUser,
+  importUsers,
 };

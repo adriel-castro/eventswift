@@ -10,15 +10,18 @@ import {
   Alert,
   Modal,
   Image,
+  Button,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as DocumentPicker from "expo-document-picker";
 import {
   deleteUser,
   getUsers,
   resetPassword,
   signUpUser,
   updateUser,
+  uploadUserFiles,
 } from "../../lib/db";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import useRefresh from "../../lib/useRefresh";
@@ -29,11 +32,13 @@ import FormField from "../../components/FormField";
 import DropdownField from "../../components/DropdownField";
 import { icons } from "../../constants";
 import DatePickerField from "../../components/DatePickerField";
+import Loader from "../../components/reusables/Loader";
 
 const Users = () => {
   const { accessToken, departments: deptItems } = useGlobalContext();
   const {
     data: allUserData,
+    loading: isUserLoading,
     setLoading: setIsUserLoading,
     refetch,
   } = useRefresh(() => getUsers(accessToken));
@@ -303,105 +308,148 @@ const Users = () => {
     }
   };
 
+  const importFile = async () => {
+    try {
+      const file = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+      });
+
+      // console.log("File picker response:", file);
+
+      if (!file.canceled && file.assets && file.assets.length > 0) {
+        const selectedFile = file.assets[0];
+        // console.log("Selected file:", selectedFile);
+
+        const formData = new FormData();
+        formData.append("file", {
+          uri: selectedFile.uri,
+          type: selectedFile.mimeType,
+          name: selectedFile.name,
+        });
+
+        const res = await uploadUserFiles(formData, accessToken);
+
+        if (res.data) {
+          await refetch();
+
+          Alert.alert("Success", "You successfully imported users!");
+        }
+      } else {
+        Alert.alert("No file selected");
+      }
+    } catch (error) {
+      console.error("Error during file import:", error);
+      Alert.alert("Error", error.message);
+    }
+  };
+
   return (
     <>
-      <SafeAreaView className="bg-primary h-full">
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          <View>
-            <View className="flex-1 flex-row justify-between items-center mt-10">
-              <Text className="text-2xl px-4  text-semibold text-secondary font-psemibold">
-                Manage Users
-              </Text>
-              <TouchableOpacity
-                className="px-4 flex flex-row"
-                onPress={() => setShowAddUser(true)}
-              >
-                <Image
-                  source={icons.plus}
-                  resizeMode="contain"
-                  tintColor="#FEA13D"
-                  className="w-8 h-8"
-                />
-              </TouchableOpacity>
-            </View>
+      {isUserLoading ? (
+        <Loader />
+      ) : (
+        <SafeAreaView className="bg-primary h-full">
+          <ScrollView
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            <View>
+              <View className="flex-1 flex-row justify-between items-center mt-10">
+                <Text className="text-2xl px-4  text-semibold text-secondary font-psemibold">
+                  Manage Users
+                </Text>
+                <View className="flex flex-row items-center mr-4">
+                  <TouchableOpacity className="mr-4" onPress={importFile}>
+                    <Icon name="file-import" size={25} color="#FEA13D" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setShowAddUser(true)}>
+                    <Image
+                      source={icons.plus}
+                      resizeMode="contain"
+                      tintColor="#FEA13D"
+                      className="w-8 h-8"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-            {sortedUserData && sortedUserData.length <= 0 ? null : (
-              <>
-                {sortedUserData.map((user, index) => (
-                  <View key={index}>
-                    <TouchableOpacity
-                      className="flex flex-row items-center justify-between w-full border-b-2 border-gray-200 mt-5 py-3 px-5"
-                      onPress={() => toggleEvent(index)}
-                    >
-                      <Text>
-                        {user.firstName.charAt(0).toUpperCase() +
-                          user.firstName.slice(1) +
-                          " " +
-                          user.lastName.charAt(0).toUpperCase() +
-                          user.lastName.slice(1)}
-                      </Text>
-                      <View className="flex flex-row gap-3">
-                        <View className="flex flex-row mr-2">
-                          <TouchableOpacity
-                            className="mr-3"
-                            onPress={() => handleShowEditModal(user)}
-                          >
-                            <Icon name="edit" size={20} color="#FEA13D" />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => handleShowDeleteModal(user)}
-                          >
-                            <Icon name="trash-alt" size={20} color="red" />
-                          </TouchableOpacity>
-                        </View>
-                        <Icon
-                          name="caret-down"
-                          size={15}
-                          color="gray"
-                          style={{
-                            transform: [
-                              {
-                                rotate:
-                                  openEventIndex === index ? "180deg" : "0deg",
-                              },
-                            ],
-                          }}
-                        />
-                      </View>
-                    </TouchableOpacity>
-
-                    {openEventIndex === index && (
-                      <View className="mx-2 p-3 border-secondary border-2">
-                        <Text>Email: {user.email}</Text>
-                        <Text>Student ID: {user.studentID}</Text>
+              {sortedUserData && sortedUserData.length <= 0 ? null : (
+                <>
+                  {sortedUserData.map((user, index) => (
+                    <View key={index}>
+                      <TouchableOpacity
+                        className="flex flex-row items-center justify-between w-full border-b-2 border-gray-200 mt-5 py-3 px-5"
+                        onPress={() => toggleEvent(index)}
+                      >
                         <Text>
-                          BirthDate: {moment(user.birthdate).format("LL")}
+                          {user.firstName.charAt(0).toUpperCase() +
+                            user.firstName.slice(1) +
+                            " " +
+                            user.lastName.charAt(0).toUpperCase() +
+                            user.lastName.slice(1)}
                         </Text>
-                        {user.address ? (
-                          <Text>Address: {user.address}</Text>
-                        ) : null}
-                        <Text>Department: {user.department}</Text>
-                        <Text>Year: {user.year}</Text>
-                        <Text>Role: {user.role}</Text>
-                        <Text
-                          className="text-secondary underline"
-                          onPress={() => handleShowReset(user._id)}
-                        >
-                          Reset Password
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </>
-            )}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+                        <View className="flex flex-row gap-3">
+                          <View className="flex flex-row mr-2">
+                            <TouchableOpacity
+                              className="mr-3"
+                              onPress={() => handleShowEditModal(user)}
+                            >
+                              <Icon name="edit" size={20} color="#FEA13D" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => handleShowDeleteModal(user)}
+                            >
+                              <Icon name="trash-alt" size={20} color="red" />
+                            </TouchableOpacity>
+                          </View>
+                          <Icon
+                            name="caret-down"
+                            size={15}
+                            color="gray"
+                            style={{
+                              transform: [
+                                {
+                                  rotate:
+                                    openEventIndex === index
+                                      ? "180deg"
+                                      : "0deg",
+                                },
+                              ],
+                            }}
+                          />
+                        </View>
+                      </TouchableOpacity>
+
+                      {openEventIndex === index && (
+                        <View className="mx-2 p-3 border-secondary border-2">
+                          <Text>Email: {user.email}</Text>
+                          <Text>Student ID: {user.studentID}</Text>
+                          <Text>
+                            BirthDate: {moment(user.birthdate).format("LL")}
+                          </Text>
+                          {user.address ? (
+                            <Text>Address: {user.address}</Text>
+                          ) : null}
+                          <Text>Department: {user.department}</Text>
+                          <Text>Year: {user.year}</Text>
+                          <Text>Role: {user.role}</Text>
+                          <Text
+                            className="text-secondary underline"
+                            onPress={() => handleShowReset(user._id)}
+                          >
+                            Reset Password
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </>
+              )}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      )}
 
       {/* Add User */}
       <Modal
