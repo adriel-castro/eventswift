@@ -235,6 +235,15 @@ export const getEventLogs = async (id, token) => {
   }
 };
 
+export const importAttendance = async (eventId, formData, token) => {
+  try {
+    const res = await api.uploadAttendance(eventId, formData, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
 export const eventCheckIn = async (id, token) => {
   try {
     const res = await api.checkInToEvent(id, token);

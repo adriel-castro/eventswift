@@ -50,7 +50,13 @@ const Attendance = () => {
         dataEvent.map(async (event) => {
           const attendance = await eventAttendances(event._id, accessToken);
           return {
-            eventName: { _id: event._id, name: event.name },
+            eventName: {
+              _id: event._id,
+              name: event.name,
+              eventDate: event.eventDate,
+              startTime: event.startTime,
+              endTime: event.endTime,
+            },
             attendance: attendance.data,
           };
         })
@@ -390,16 +396,23 @@ const Attendance = () => {
                 Attendance
               </Text> */}
                 <Text className="text-2xl px-4 text-semibold text-secondary font-psemibold">
-                  Attendance
+                  Attendance{" "}
+                  {eventsAttendance ? `(${eventsAttendance.length})` : ""}
                 </Text>
               </View>
             }
-            renderItem={({ item }) => (
-              <View className="mb-4 p-4 border border-gray-300 rounded">
+            renderItem={({ item, index }) => (
+              <View className="mb-4 p-4 border-b-2 border-gray-300 rounded">
                 <View className="flex flex-row justify-between items-center mb-2">
-                  <Text className="text-lg font-bold text-secondary mb-2">
-                    {item.eventName.name}
-                  </Text>
+                  <View className="mb-2">
+                    <Text className="text-lg font-bold text-secondary">
+                      {index + 1}. {item.eventName.name}
+                    </Text>
+                    <Text className="text-sm font-bold text-secondary ml-5">
+                      {moment(item.eventName.eventDate).format("MMM. DD, YYYY")}
+                      , {item.eventName.startTime}-{item.eventName.endTime}
+                    </Text>
+                  </View>
                   {user?.role !== "admin" ? null : (
                     <TouchableOpacity
                       onPress={() =>

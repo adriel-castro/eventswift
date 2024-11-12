@@ -152,6 +152,15 @@ export const getUserEventLogs = (eventId, accessToken) => {
   });
 };
 
+export const uploadAttendance = (eventId, formData, accessToken) => {
+  return axios.post(`${url}/attendance/import/${eventId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
 export const checkInToEvent = (eventId, accessToken) => {
   return axios.post(
     `${url}/attendance/checkin/${eventId}`,
