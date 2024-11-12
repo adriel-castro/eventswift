@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import * as DocumentPicker from "expo-document-picker";
 import CustomButton from "./CustomButton";
 import { router } from "expo-router";
 import moment from "moment";
@@ -19,7 +20,7 @@ import DropdownField from "./DropdownField";
 import { useGlobalContext } from "../context/GlobalProvider";
 import DatePickerField from "./DatePickerField";
 import TimePickerField from "./TimePickerField";
-import { deleteEvent, updateEvent } from "../lib/db";
+import { deleteEvent, importAttendance, updateEvent } from "../lib/db";
 import Loader from "./reusables/Loader";
 
 const EventAccordion = ({ event, isOpen, onToggle, refetch }) => {
@@ -218,6 +219,41 @@ const EventAccordion = ({ event, isOpen, onToggle, refetch }) => {
       : "Finished";
   };
 
+  const importAttendanceFile = async (event) => {
+    try {
+      const file = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+      });
+
+      // console.log("File picker response:", file);
+
+      if (!file.canceled && file.assets && file.assets.length > 0) {
+        const selectedFile = file.assets[0];
+        // console.log("Selected file:", selectedFile);
+
+        const formData = new FormData();
+        formData.append("file", {
+          uri: selectedFile.uri,
+          type: selectedFile.mimeType,
+          name: selectedFile.name,
+        });
+
+        const res = await importAttendance(event._id, formData, accessToken);
+
+        if (res.data) {
+          await refetch();
+
+          Alert.alert("Success", "You successfully imported event attendance!");
+        }
+      } else {
+        Alert.alert("No file selected");
+      }
+    } catch (error) {
+      console.error("Error during file import:", error);
+      Alert.alert("Error", error.message || "File import failed");
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -232,6 +268,12 @@ const EventAccordion = ({ event, isOpen, onToggle, refetch }) => {
             <View className="flex flex-row gap-5">
               {user?.role === "admin" ? (
                 <View className="flex flex-row mr-2">
+                  <TouchableOpacity
+                    className="mr-3"
+                    onPress={() => importAttendanceFile(event)}
+                  >
+                    <Icon name="file-export" size={20} color="#FEA13D" />
+                  </TouchableOpacity>
                   <TouchableOpacity
                     className="mr-3"
                     onPress={() => handleShowEditModal(event)}
