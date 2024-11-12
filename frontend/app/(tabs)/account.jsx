@@ -206,13 +206,15 @@ const Account = () => {
                       }
                       subtitle="Events"
                       titleStyles="text-xl"
-                      // containerStyles="mr-10"
+                      containerStyles={user?.role === "admin" ? "mr-10" : ""}
                     />
-                    {/* <InfoBox
-                      title={userAttendance.length || 0}
-                      subtitle="Attended"
-                      titleStyles="text-xl"
-                    /> */}
+                    {user?.role === "admin" ? (
+                      <InfoBox
+                        title={userAttendance.length || 0}
+                        subtitle="Attendance"
+                        titleStyles="text-xl"
+                      />
+                    ) : null}
                   </View>
                 </View>
 

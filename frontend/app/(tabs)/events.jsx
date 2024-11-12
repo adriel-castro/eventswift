@@ -188,17 +188,19 @@ const Events = () => {
               <Text className="text-2xl px-4  text-semibold text-secondary font-psemibold">
                 Events
               </Text>
-              <TouchableOpacity
-                className="px-4 flex flex-row"
-                onPress={() => setShowCreateEvent(true)}
-              >
-                <Image
-                  source={icons.plus}
-                  resizeMode="contain"
-                  tintColor="#FEA13D"
-                  className="w-8 h-8"
-                />
-              </TouchableOpacity>
+              {user?.role !== "admin" ? null : (
+                <TouchableOpacity
+                  className="px-4 flex flex-row"
+                  onPress={() => setShowCreateEvent(true)}
+                >
+                  <Image
+                    source={icons.plus}
+                    resizeMode="contain"
+                    tintColor="#FEA13D"
+                    className="w-8 h-8"
+                  />
+                </TouchableOpacity>
+              )}
             </View>
             {user?.role === "admin" ? (
               eventsData && eventsData.length <= 0 ? null : (
