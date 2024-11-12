@@ -104,6 +104,15 @@ export const deleteUser = async (id, token) => {
   }
 };
 
+export const uploadUserFiles = async (formData, token) => {
+  try {
+    const res = await api.uploadUsers(formData, token);
+    return res.data;
+  } catch (error) {
+    errorHelper(error);
+  }
+};
+
 export const signOut = async () => {
   try {
     await AsyncStorage.removeItem("access_token");
