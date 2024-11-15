@@ -45,14 +45,14 @@ const Users = () => {
   const [showAddUser, setShowAddUser] = useState(false);
   const [showEditUser, setShowEditUser] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
-  const [showBirthDate, setShowBirthDate] = useState(false);
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [editDateOfBirth, setEditDateOfBirth] = useState("");
   const [userData, setUserData] = useState(null);
   const [openEventIndex, setOpenEventIndex] = useState(null);
   const [openDepartment, setOpenDepartment] = useState(false);
   const [departmentItems, setDepartmentItems] = useState(deptItems);
   const [openRole, setOpenRole] = useState(false);
+  // const [showBirthDate, setShowBirthDate] = useState(false);
+  // const [dateOfBirth, setDateOfBirth] = useState("");
+  // const [editDateOfBirth, setEditDateOfBirth] = useState("");
   const [roleItems, setRoleItems] = useState([
     {
       value: "user",
@@ -73,7 +73,7 @@ const Users = () => {
     password: "TempPassword!",
     firstName: "",
     lastName: "",
-    birthDate: "",
+    // birthDate: "",
     address: "",
     department: "",
     year: "",
@@ -123,33 +123,33 @@ const Users = () => {
     setEditUser({ ...editUser, [field]: value });
   };
 
-  const handleDateChange = (field, selectedDate) => {
-    setShowBirthDate(false);
-    setDateOfBirth(selectedDate);
-  };
+  // const handleDateChange = (field, selectedDate) => {
+  //   setShowBirthDate(false);
+  //   setDateOfBirth(selectedDate);
+  // };
 
-  const handleDateEditChange = (field, selectedDate) => {
-    setShowBirthDate(false);
-    setEditDateOfBirth(selectedDate);
-  };
+  // const handleDateEditChange = (field, selectedDate) => {
+  //   setShowBirthDate(false);
+  //   setEditDateOfBirth(selectedDate);
+  // };
 
-  useEffect(() => {
-    if (dateOfBirth) {
-      setCreateUser({
-        ...createUser,
-        birthDate: moment(dateOfBirth).format("YYYY-MM-DD"),
-      });
-    }
-  }, [dateOfBirth]);
+  // useEffect(() => {
+  //   if (dateOfBirth) {
+  //     setCreateUser({
+  //       ...createUser,
+  //       birthDate: moment(dateOfBirth).format("YYYY-MM-DD"),
+  //     });
+  //   }
+  // }, [dateOfBirth]);
 
-  useEffect(() => {
-    if (editDateOfBirth) {
-      setEditUser({
-        ...editUser,
-        birthDate: moment(editDateOfBirth).format("YYYY-MM-DD"),
-      });
-    }
-  }, [editDateOfBirth]);
+  // useEffect(() => {
+  //   if (editDateOfBirth) {
+  //     setEditUser({
+  //       ...editUser,
+  //       birthDate: moment(editDateOfBirth).format("YYYY-MM-DD"),
+  //     });
+  //   }
+  // }, [editDateOfBirth]);
 
   useEffect(() => {
     if (userData !== null) {
@@ -158,14 +158,14 @@ const Users = () => {
         studentID: userData.studentID,
         firstName: userData.firstName,
         lastName: userData.lastName,
-        birthDate: moment(userData.birthDate).format("YYYY-MM-DD"),
+        // birthDate: moment(userData.birthDate).format("YYYY-MM-DD"),
         address: userData.address,
         department: userData.department,
         year: userData.year,
         role: userData.role,
       };
       setEditUser(newObj);
-      setEditDateOfBirth(new Date(userData.birthDate));
+      // setEditDateOfBirth(new Date(userData.birthDate));
     }
   }, [userData]);
 
@@ -198,7 +198,7 @@ const Users = () => {
           password: "TempPassword!",
           firstName: "",
           lastName: "",
-          birthDate: "",
+          // birthDate: "",
           address: "",
           department: "",
           year: "",
@@ -424,9 +424,9 @@ const Users = () => {
                         <View className="mx-2 p-3 border-secondary border-2">
                           <Text>Email: {user.email}</Text>
                           <Text>Student ID: {user.studentID}</Text>
-                          <Text>
+                          {/* <Text>
                             BirthDate: {moment(user.birthdate).format("LL")}
-                          </Text>
+                          </Text> */}
                           {user.address ? (
                             <Text>Address: {user.address}</Text>
                           ) : null}
@@ -497,14 +497,14 @@ const Users = () => {
                     handleChangeText={(e) => handleChange("lastName", e)}
                     otherStyles="mt-5"
                   />
-                  <DatePickerField
+                  {/* <DatePickerField
                     title="Birth Date"
                     value={dateOfBirth}
                     handleChangeText={handleDateChange}
                     otherStyles="mt-5"
                     showDatePicker={showBirthDate}
                     toggleDatePicker={() => setShowBirthDate(true)}
-                  />
+                  /> */}
 
                   <DropdownField
                     title="Department"
@@ -609,14 +609,14 @@ const Users = () => {
                     handleChangeText={(e) => handleEditChange("lastName", e)}
                     otherStyles="mt-5"
                   />
-                  <DatePickerField
+                  {/* <DatePickerField
                     title="Birth Date"
                     value={editDateOfBirth}
                     handleChangeText={handleDateEditChange}
                     otherStyles="mt-5"
                     showDatePicker={showBirthDate}
                     toggleDatePicker={() => setShowBirthDate(true)}
-                  />
+                  /> */}
 
                   <DropdownField
                     title="Department"

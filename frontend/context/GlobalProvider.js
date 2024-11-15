@@ -22,7 +22,7 @@ const GlobalProvider = ({ children }) => {
     setIsLoggedIn
   );
   const { ongoingEvent } = useTimestamps(accessToken, networkStatus);
-  const { departments } = useDepartments(networkStatus);
+  const { departments } = useDepartments(accessToken, networkStatus);
 
   const signalLevel = networkStatus
     ? networkStatus.signal_level
@@ -34,7 +34,6 @@ const GlobalProvider = ({ children }) => {
       handleLogout();
       setUser(null);
       setIsLoggedIn(false);
-      router.replace("/login");
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -61,6 +60,8 @@ const GlobalProvider = ({ children }) => {
         const token = await AsyncStorage.getItem("access_token");
         if (token) {
           setAccessToken(token);
+        } else {
+          setAccessToken("");
         }
       } catch (error) {
         console.log("Error getting token:", error.message);

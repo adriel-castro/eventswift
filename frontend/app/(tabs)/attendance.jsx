@@ -109,10 +109,11 @@ const Attendance = () => {
         studentID: item.attendee.studentID,
         fullName: `${item.attendee.firstName} ${item.attendee.lastName}`,
         timestamps: item.timestamps.length,
+        status: item.timestamps.length > 3 ? "Present" : "Absent",
         duration: `${totalDuration(
           item.event.startTime,
           item.event.endTime
-        )} hours`,
+        )} hour(s)`,
       }));
 
   const fetchFeedback = async (id) => {
@@ -151,6 +152,7 @@ const Attendance = () => {
         <Text className="flex-1 text-center">{item.fullName}</Text>
         <Text className="flex-1 text-center">{item.timestamps}</Text>
         <Text className="flex-1 text-center">{item.duration}</Text>
+        <Text className="flex-1 text-center">{item.status}</Text>
       </View>
     );
   };
@@ -197,15 +199,19 @@ const Attendance = () => {
         "Full Name",
         "Timestamps",
         "Duration",
+        "Status",
       ];
 
-      // Draw the table header row
+      const columnWidths = [20, 30, 50, 40, 30, 30]; // Adjust column widths
       const headerHeight = 8;
       let yPosition = margin + 30;
+
+      // Draw the table header row
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
       headers.forEach((header, index) => {
-        const xPosition = tableX + index * (tableWidth / headers.length);
+        const xPosition =
+          tableX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0); // Calculate x position for each header
         doc.text(header, xPosition, yPosition);
       });
 
@@ -214,15 +220,23 @@ const Attendance = () => {
       doc.setFont("helvetica", "normal");
       attendanceData.forEach((entry, index) => {
         yPosition += 8;
-        doc.text(entry.id.toString(), tableX + 0, yPosition);
-        doc.text(entry.studentID, tableX + tableWidth / 5, yPosition);
-        doc.text(entry.fullName, tableX + (2 * tableWidth) / 5, yPosition);
-        doc.text(
-          entry.timestamps.toString(),
-          tableX + (3 * tableWidth) / 5,
-          yPosition
-        );
-        doc.text(entry.duration, tableX + (4 * tableWidth) / 5, yPosition);
+        let xPosition = tableX;
+        doc.text(entry.id.toString(), xPosition, yPosition);
+        xPosition += columnWidths[0]; // Move x position to next column
+
+        doc.text(entry.studentID, xPosition, yPosition);
+        xPosition += columnWidths[1];
+
+        doc.text(entry.fullName, xPosition, yPosition);
+        xPosition += columnWidths[2];
+
+        doc.text(entry.timestamps.toString(), xPosition, yPosition);
+        xPosition += columnWidths[3];
+
+        doc.text(entry.duration, xPosition, yPosition);
+        xPosition += columnWidths[4];
+
+        doc.text(entry.status, xPosition, yPosition);
       });
 
       // Check if content overflows and add another page if necessary
@@ -438,6 +452,7 @@ const Attendance = () => {
                     Timestamps
                   </Text>
                   <Text className="flex-1 text-center font-bold">Duration</Text>
+                  <Text className="flex-1 text-center font-bold">Status</Text>
                 </View>
                 <FlatList
                   data={dataTable(item.attendance)}

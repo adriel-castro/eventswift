@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getDepartments } from "./db";
 
-const useDepartments = (networkStatus) => {
+const useDepartments = (accessToken) => {
   const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
@@ -18,13 +18,12 @@ const useDepartments = (networkStatus) => {
 
         setDepartments(allDepartment);
       } catch (error) {
-        console.log("error on departments");
-        console.log("undef", error.message);
+        console.log("error on departments", error.message);
       }
     };
 
     getAllDepartment();
-  }, [networkStatus]);
+  }, [accessToken]);
 
   return { departments };
 };
