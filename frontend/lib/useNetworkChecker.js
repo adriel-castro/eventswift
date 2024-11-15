@@ -22,7 +22,7 @@ const useNetworkChecker = (setUser, setIsLoggedIn) => {
           Alert.alert("Warning", "No Wi-Fi data received.");
         }
       } catch (error) {
-        Alert.alert("Error1", error.message);
+        Alert.alert("Network Error", error.message);
         await signOut();
         setUser(null);
         setIsLoggedIn(false);
@@ -45,7 +45,7 @@ const useNetworkChecker = (setUser, setIsLoggedIn) => {
   const handleLogout = () => {
     clearInterval(intervalId);
     // signOut();
-    router.replace("/login");
+    // router.replace("/login");
   };
 
   return { isNetworkLoading, networkStatus, handleLogout };

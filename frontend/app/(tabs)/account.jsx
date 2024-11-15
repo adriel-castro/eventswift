@@ -44,24 +44,27 @@ const Account = () => {
     accessToken,
     departments: deptItems,
   } = useGlobalContext();
-  const { data: eventsData } = useRefresh(() => getEvents(accessToken));
-  const { data: departmentEventsData } = useRefresh(() =>
-    getDepartmentEvents(user?._id, accessToken)
+  const { data: eventsData } = useRefresh(
+    async () => await getEvents(accessToken)
   );
-  const { data: userAttendance } = useRefresh(() =>
-    usersAttendance(accessToken)
+  // const departmentEventsData = [];
+  const { data: departmentEventsData } = useRefresh(
+    async () => await getDepartmentEvents(user?._id, accessToken)
   );
-  const { data: accountData, refetch: refetchUser } = useRefresh(() =>
-    getUserAccount(user?._id, accessToken)
+  const { data: userAttendance } = useRefresh(
+    async () => await usersAttendance(accessToken)
+  );
+  const { data: accountData, refetch: refetchUser } = useRefresh(
+    async () => await getUserAccount(user?._id, accessToken)
   );
 
   const [showEditAccount, setShowEditAccount] = useState(false);
-  const [showBirthDate, setShowBirthDate] = useState(false);
-  const [dateOfBirth, setDateOfBirth] = useState("");
   const [openDepartment, setOpenDepartment] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [departmentItems, setDepartmentItems] = useState(deptItems);
   const [accountUpdate, setAccountUpdate] = useState([]);
+  // const [showBirthDate, setShowBirthDate] = useState(false);
+  // const [dateOfBirth, setDateOfBirth] = useState("");
 
   const onRefreshUser = async () => {
     setRefreshing(true);
@@ -73,19 +76,19 @@ const Account = () => {
     setAccountUpdate({ ...accountUpdate, [field]: value });
   };
 
-  const handleDateChange = (field, selectedDate) => {
-    setShowBirthDate(false);
-    setDateOfBirth(selectedDate);
-  };
+  // const handleDateChange = (field, selectedDate) => {
+  //   setShowBirthDate(false);
+  //   setDateOfBirth(selectedDate);
+  // };
 
-  useEffect(() => {
-    if (dateOfBirth) {
-      setAccountUpdate({
-        ...accountUpdate,
-        birthDate: moment(dateOfBirth).format("YYYY-MM-DD"),
-      });
-    }
-  }, [dateOfBirth]);
+  // useEffect(() => {
+  //   if (dateOfBirth) {
+  //     setAccountUpdate({
+  //       ...accountUpdate,
+  //       birthDate: moment(dateOfBirth).format("YYYY-MM-DD"),
+  //     });
+  //   }
+  // }, [dateOfBirth]);
 
   useEffect(() => {
     if (accountData) {
@@ -94,14 +97,14 @@ const Account = () => {
         studentID: accountData.studentID,
         firstName: accountData.firstName,
         lastName: accountData.lastName,
-        birthDate: moment(accountData.birthDate).format("YYYY-MM-DD"),
+        // birthDate: moment(accountData.birthDate).format("YYYY-MM-DD"),
         address: accountData.address ?? "",
         department: accountData.department,
         year: accountData.year,
         role: accountData.role,
       };
       setAccountUpdate(newObj);
-      setDateOfBirth(new Date(accountData.birthDate));
+      // setDateOfBirth(new Date(accountData.birthDate));
     }
   }, [accountData]);
 
@@ -187,11 +190,11 @@ const Account = () => {
                   </View>
                   <InfoBox
                     title={
-                      user?.firstName.charAt(0).toUpperCase() +
-                      user?.firstName.slice(1) +
+                      user?.firstName?.charAt(0).toUpperCase() +
+                      user?.firstName?.slice(1) +
                       " " +
-                      user?.lastName.charAt(0).toUpperCase() +
-                      user?.lastName.slice(1)
+                      user?.lastName?.charAt(0).toUpperCase() +
+                      user?.lastName?.slice(1)
                     }
                     containerStyles="mt-5 text-center"
                     titleStyles="text-lg"
@@ -318,14 +321,14 @@ const Account = () => {
                     otherStyles="mt-5"
                   />
 
-                  <DatePickerField
+                  {/* <DatePickerField
                     title="Birth Date"
                     value={dateOfBirth}
                     handleChangeText={handleDateChange}
                     otherStyles="mt-5"
                     showDatePicker={showBirthDate}
                     toggleDatePicker={() => setShowBirthDate(true)}
-                  />
+                  /> */}
 
                   <DropdownField
                     title="Department"

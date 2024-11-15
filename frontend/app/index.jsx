@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../components/CustomButton";
 import { Redirect, router } from "expo-router";
 import { useGlobalContext } from "../context/GlobalProvider";
+import { images } from "../constants";
 
 const App = () => {
   const { isLoading, isLoggedIn, networkStatus } = useGlobalContext();
@@ -19,6 +20,11 @@ const App = () => {
         }}
       >
         <View className="w-full min-h-[85vh] justify-center items-center px-4">
+          <Image
+            source={images.logo}
+            resizeMode="contain"
+            className="w-[250px] h-[250px]"
+          />
           <CustomButton
             title="Login Eventswift"
             handlePress={() => router.push("/login")}

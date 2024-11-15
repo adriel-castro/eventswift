@@ -4,10 +4,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import { addTimeStamps } from "./db";
 import { router } from "expo-router";
+import Constants from "expo-constants";
 
-const useTimestamps = (accessToken, networkStatus, intervalDuration = 15) => {
+const useTimestamps = (accessToken, networkStatus) => {
   const [ongoingEvent, setOngoingEvent] = useState(null);
   const [intervalId, setIntervalId] = useState(null);
+  const intervalDuration = Constants.expoConfig.extra.LOG_INTERVAL;
 
   // console.log("ongoingEvent", ongoingEvent);
 

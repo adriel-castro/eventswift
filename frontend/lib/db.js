@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as api from "../api";
 import { errorHelper } from "../helpers/error.helper";
+import { router } from "expo-router";
 
 export const loginUser = async (username, password) => {
   try {
@@ -116,6 +117,7 @@ export const uploadUserFiles = async (formData, token) => {
 export const signOut = async () => {
   try {
     await AsyncStorage.removeItem("access_token");
+    router.replace("/login");
     // await AsyncStorage.removeItem("joined_event");
   } catch (error) {
     if (error.response && error.response.data && error.response.data.errors) {
