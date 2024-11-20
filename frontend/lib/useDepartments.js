@@ -7,9 +7,11 @@ const useDepartments = (accessToken) => {
   useEffect(() => {
     const getAllDepartment = async () => {
       try {
-        const dept = await getDepartments();
+        const res = await getDepartments();
+        const dept = res.data;
+
         let allDepartment = [];
-        dept?.data.forEach((item) => {
+        dept.forEach((item) => {
           allDepartment.push({
             value: item.name,
             label: item.name,

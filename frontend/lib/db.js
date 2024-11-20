@@ -135,15 +135,8 @@ export const getDepartments = async () => {
     const department = res?.data;
     return department;
   } catch (error) {
-    console.log("dept error", error);
-    let errorMessage;
-    if (error?.response?.data?.errors?.length > 0) {
-      errorMessage = error?.respons?.data?.errors[0]?.message;
-      throw new Error(errorMessage);
-    } else if (error?.response?.data?.errors) {
-      errorMessage = error?.response?.data?.errors?.message;
-      throw new Error(errorMessage);
-    }
+    const errorMessage = error?.response?.data?.error?.message;
+    throw new Error(errorMessage);
   }
 };
 
@@ -188,7 +181,8 @@ export const getEvents = async (token) => {
     const event = await api.getAllEvents(token);
     return event.data;
   } catch (error) {
-    errorHelper(error);
+    const errorMessage = error.response.data.error.message;
+    throw new Error(errorMessage);
   }
 };
 

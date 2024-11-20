@@ -23,7 +23,8 @@ const LogIn = () => {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setUser, setIsLoggedIn, networkStatus } = useGlobalContext();
+  const { setUser, setIsLoggedIn, networkStatus, setAccessToken } =
+    useGlobalContext();
 
   const storeData = async (key, value) => {
     try {
@@ -41,17 +42,23 @@ const LogIn = () => {
 
     setIsSubmitting(true);
     try {
-      const data = await loginUser(form.username, form.password);
-      const token = data.data.accessToken;
-      const result = await getCurrentUser(token);
+      const res = await loginUser(form.username, form.password);
 
-      await storeData("access_token", token);
+      if (res.data) {
+        const token = res.data.accessToken;
+        const result = await getCurrentUser(token);
 
-      setUser(result.data);
-      setIsLoggedIn(true);
+        setAccessToken(token);
+        await storeData("access_token", token);
 
-      Alert.alert("Success", "User signed in successfully!");
-      router.replace("/home");
+        if (result.data) {
+          setUser(result.data);
+          setIsLoggedIn(true);
+
+          Alert.alert("Success", "User signed in successfully!");
+          router.replace("/home");
+        }
+      }
     } catch (error) {
       console.log("Login error:", error);
       Alert.alert("Error", error.message || "An error occurred during login.");

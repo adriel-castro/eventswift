@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 import { Alert } from "react-native";
 import { getCurrentUser, signOut } from "../lib/db";
 import useNetworkChecker from "../lib/useNetworkChecker";
@@ -34,25 +33,26 @@ const GlobalProvider = ({ children }) => {
       handleLogout();
       setUser(null);
       setIsLoggedIn(false);
+      setAccessToken("");
     } catch (error) {
       Alert.alert("Error", error.message);
     }
   };
 
-  useEffect(() => {
-    if (signalLevel) {
-      if (signalLevel <= -70) {
-        // console.log("Signal level is weak:", signalLevel);
-        Alert.alert(
-          "Warning",
-          "Your Wi-Fi signal seems too weak. Please check your connection!"
-        );
-      }
-    } else {
-      console.log("Signal level is undefined or null");
-      logout();
-    }
-  }, [networkStatus, signalLevel]);
+  // useEffect(() => {
+  //   if (signalLevel) {
+  //     if (signalLevel <= -70) {
+  //       // console.log("Signal level is weak:", signalLevel);
+  //       Alert.alert(
+  //         "Warning",
+  //         "Your Wi-Fi signal seems too weak. Please check your connection!"
+  //       );
+  //     }
+  //   } else {
+  //     console.log("Signal level is undefined or null");
+  //     logout();
+  //   }
+  // }, [networkStatus, signalLevel]);
 
   useEffect(() => {
     const getToken = async () => {
@@ -97,13 +97,14 @@ const GlobalProvider = ({ children }) => {
   return (
     <GlobalContext.Provider
       value={{
+        accessToken,
+        setAccessToken,
         isLoggedIn,
         setIsLoggedIn,
         user,
         setUser,
         isLoading,
         setIsLoading,
-        accessToken,
         networkStatus,
         logout,
         departments,
