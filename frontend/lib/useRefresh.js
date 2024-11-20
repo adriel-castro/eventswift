@@ -11,8 +11,8 @@ const useRefresh = (fn) => {
       const res = await fn();
       setData(res.data);
     } catch (error) {
-      console.log("error on refresh", error);
-      // Alert.alert("Error", error.message);
+      console.log(`error on refresh`, error);
+      Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
     }
