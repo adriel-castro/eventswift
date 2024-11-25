@@ -90,6 +90,14 @@ const createFeedback = async (req, res) => {
       $and: [{ event: req.params.eventId }, { attendee: req.user._id }],
     });
 
+    if (!attendance) {
+      return res.status(404).json({
+        status: false,
+        data: [],
+        error: "You did not attend to this event.",
+      });
+    }
+
     const isPresent = attendance.timestamps.length > 3 ? true : false;
 
     if (!isPresent) {
