@@ -57,7 +57,7 @@ const Attendance = () => {
               startTime: event.startTime,
               endTime: event.endTime,
             },
-            attendance: attendance.data,
+            attendance: attendance.data.filter((a) => a.attendee !== null),
           };
         })
       );
@@ -70,7 +70,9 @@ const Attendance = () => {
         user?.role !== "admin"
           ? allData.map((a) => ({
               eventName: a?.eventName,
-              attendance: a?.attendance.filter((b) => b?.attendee?._id === userId),
+              attendance: a?.attendance.filter(
+                (b) => b?.attendee?._id === userId
+              ),
             }))
           : allData;
 

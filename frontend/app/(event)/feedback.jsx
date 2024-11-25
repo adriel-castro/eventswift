@@ -42,14 +42,14 @@ const FeedbackRating = () => {
     try {
       await createFeedback(eventId, accessToken, feedback);
       Alert.alert("Success", "You successfully submitted event feedback!");
-      router.push("/home");
+      router.push("/events");
       setFeedback({
         rating: 0,
         comment: "",
       });
     } catch (error) {
       Alert.alert("Error", error.message);
-      router.push("/home");
+      router.push("/events");
     } finally {
       setIsLoading(false);
     }
