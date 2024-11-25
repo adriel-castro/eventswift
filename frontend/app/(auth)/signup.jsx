@@ -14,9 +14,10 @@ import { Link, router } from "expo-router";
 import { images } from "../../constants";
 import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
-import { signUpUser } from "../../lib/db";
+import { getCurrentUser, signUpUser } from "../../lib/db";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import DropdownField from "../../components/DropdownField";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -31,7 +32,12 @@ const SignUp = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser, setIsLoggedIn, departments: deptData } = useGlobalContext();
+  const {
+    setUser,
+    setIsLoggedIn,
+    departments: deptData,
+    setAccessToken,
+  } = useGlobalContext();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -40,6 +46,14 @@ const SignUp = () => {
 
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
+  };
+
+  const storeData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (error) {
+      console.log("Error storing token:", error.message || "Unknown error");
+    }
   };
 
   const submit = async () => {
@@ -59,12 +73,23 @@ const SignUp = () => {
     setIsSubmitting(true);
     try {
       if (form.password === confirmPassword) {
-        const result = await signUpUser(form);
-        setUser(result);
-        setIsLoggedIn(true);
+        const res = await signUpUser(form);
 
-        Alert.alert("Success", "You have signed up successfully!");
-        router.replace("/home");
+        if (res.data) {
+          const token = res.data.accessToken;
+          const result = await getCurrentUser(token);
+
+          setAccessToken(token);
+          await storeData("access_token", token);
+
+          if (result.data) {
+            setUser(result.data);
+            setIsLoggedIn(true);
+
+            Alert.alert("Success", "You have signed up successfully!");
+            router.replace("/home");
+          }
+        }
       } else {
         Alert.alert("Error", "Passwords do not match!");
       }
