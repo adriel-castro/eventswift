@@ -12,7 +12,7 @@ const AttendanceSchema = mongoose.Schema({
     ref: "user",
   },
   timestamps: [{ type: Date, required: true }],
-  duration: { type: Number, default: 0 },
+  // duration: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

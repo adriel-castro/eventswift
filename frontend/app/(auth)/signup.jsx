@@ -73,23 +73,26 @@ const SignUp = () => {
     setIsSubmitting(true);
     try {
       if (form.password === confirmPassword) {
-        const res = await signUpUser(form);
+        // const res = await signUpUser(form);
+        await signUpUser(form);
 
-        if (res.data) {
-          const token = res.data.accessToken;
-          const result = await getCurrentUser(token);
+        // if (res.data) {
+        //   const token = res.data.accessToken;
+        //   const result = await getCurrentUser(token);
 
-          setAccessToken(token);
-          await storeData("access_token", token);
+        //   setAccessToken(token);
+        //   await storeData("access_token", token);
 
-          if (result.data) {
-            setUser(result.data);
-            setIsLoggedIn(true);
+        //   if (result.data) {
+        //     setUser(result.data);
+        //     setIsLoggedIn(true);
 
-            Alert.alert("Success", "You have signed up successfully!");
-            router.replace("/home");
-          }
-        }
+        //     Alert.alert("Success", "You have signed up successfully!");
+        //     router.replace("/home");
+        //   }
+        // }
+        Alert.alert("Success", "You have signed up successfully!");
+        router.replace("/login");
       } else {
         Alert.alert("Error", "Passwords do not match!");
       }

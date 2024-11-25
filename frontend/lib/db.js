@@ -272,7 +272,8 @@ export const addTimeStamps = async (id, token) => {
     const res = await api.updateEventTimeStamps(id, token);
     return res.data;
   } catch (error) {
-    errorHelper(error);
+    const errorMessage = error.response.data.error.message;
+    throw new Error(errorMessage);
   }
 };
 

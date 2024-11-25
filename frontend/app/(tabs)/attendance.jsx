@@ -69,14 +69,14 @@ const Attendance = () => {
       const filteredData =
         user?.role !== "admin"
           ? allData.map((a) => ({
-              eventName: a.eventName,
-              attendance: a.attendance.filter((b) => b.attendee._id === userId),
+              eventName: a?.eventName,
+              attendance: a?.attendance.filter((b) => b?.attendee?._id === userId),
             }))
           : allData;
 
       // If the user is not admin and no attendance data is found, set eventsAttendance to null
       const finalData =
-        filteredData.every((item) => item.attendance.length === 0) &&
+        filteredData.every((item) => item?.attendance.length === 0) &&
         user?.role !== "admin"
           ? null
           : filteredData;
