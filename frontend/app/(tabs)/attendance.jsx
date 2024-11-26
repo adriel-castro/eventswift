@@ -33,6 +33,47 @@ const Attendance = () => {
     getDepartmentEvents(user?._id, accessToken)
   );
   const [eventsAttendance, setEventsAttendance] = useState([]);
+  const filteredEvents = eventsAttendance
+    ?.map((event) => {
+      const filteredAttendance = Array.isArray(event.attendance)
+        ? event.attendance.filter(
+            (attendee) => attendee.attendee?._id === user._id
+          )
+        : [];
+      return {
+        ...event,
+        attendance: filteredAttendance,
+      };
+    })
+    .filter((event) => event.attendance.length > 0);
+
+  const timeToMinutes = (time) => {
+    const [hour, minute] = time.split(/[: ]/);
+    const isPM = time.includes("PM");
+    return (parseInt(hour) % 12) * 60 + parseInt(minute) + (isPM ? 720 : 0);
+  };
+
+  const sortByDateAndTime = (a, b) => {
+    const dateA = new Date(a.eventName.eventDate);
+    const dateB = new Date(b.eventName.eventDate);
+    const dateComparison = dateB - dateA;
+
+    if (dateComparison !== 0) return dateComparison;
+
+    const startTimeComparison =
+      timeToMinutes(b.eventName.startTime) -
+      timeToMinutes(a.eventName.startTime);
+    if (startTimeComparison !== 0) return startTimeComparison;
+
+    return (
+      timeToMinutes(b.eventName.endTime) - timeToMinutes(a.eventName.endTime)
+    );
+  };
+
+  const eventsFiltered =
+    user?.role === "admin" ? eventsAttendance : filteredEvents;
+  const eventsToShow = eventsFiltered?.sort(sortByDateAndTime);
+
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [eventsFeedback, setEventsFeedback] = useState([]);
@@ -139,11 +180,14 @@ const Attendance = () => {
   const totalDuration = (startTime, endTime) => {
     const start = moment(startTime, "h:mm A");
     const end = moment(endTime, "h:mm A");
-    return end.diff(start, "hours", true);
+    const diffInHours = end.diff(start, "hours", true);
+    // Round to the nearest 0.5
+    const roundedDuration = Math.round(diffInHours * 2) / 2;
+    return roundedDuration;
   };
 
   const renderAttendanceItem = ({ item }) => {
-    if (item === null || item?.attendance?.length === 0) {
+    if (item === null) {
       return null;
     }
 
@@ -401,7 +445,7 @@ const Attendance = () => {
           <Loader />
         ) : (
           <FlatList
-            data={eventsAttendance}
+            data={eventsToShow}
             keyExtractor={(item) => item.eventName._id}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -412,8 +456,7 @@ const Attendance = () => {
                 Attendance
               </Text> */}
                 <Text className="text-2xl px-4 text-semibold text-secondary font-psemibold">
-                  Attendance{" "}
-                  {eventsAttendance ? `(${eventsAttendance.length})` : ""}
+                  Attendance {eventsToShow ? `(${eventsToShow.length})` : ""}
                 </Text>
               </View>
             }
