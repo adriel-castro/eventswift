@@ -43,7 +43,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "44bba22e-4e84-47cf-b6f9-acf45b686f56"
+        "projectId": "df1ebf20-48d8-4207-a3a7-c909c9ddbdc6"
       },
       "NODE_API": "http://192.168.5.199:5000/api",
       "LOG_INTERVAL": 1
